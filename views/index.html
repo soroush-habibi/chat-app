@@ -5,13 +5,41 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Index Page</title>
+    <link rel="stylesheet" href="CSS/style.css">
 </head>
 
 <body>
+    <h1 id="loading-text">Loading...</h1>
+    <div class="container not-auth d-none">
+        <button type="button" id="loginButton">Login</button>
+        <button type="button" id="signUpButton">Sign up</button>
+    </div>
 
+    <div class="form-container d-none">
+        <form action="">
+            <label for="">Username
+                <input type="text" id="username-input" />
+            </label>
+
+            <label for="">Email
+                <input type="text" id="email-input" />
+            </label>
+
+            <label for="">Password
+                <input type="password" id="password-input" />
+            </label>
+
+            <label for="">Repeat Password
+                <input type="password" id="password2-input" />
+            </label>
+            <button type="submit" id="submit">submit</button>
+        </form>
+        <h4 id="change">Create Account/You have account?</h4>
+    </div>
 </body>
-<script src="/socket.io/socket.io.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.0/axios.js"></script>
 <script src="JS/main.js"></script>
 
 </html>
