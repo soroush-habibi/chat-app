@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import { Server } from 'socket.io';
+import cookieParser from 'cookie-parser';
 import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -21,7 +22,9 @@ io.of("/gp").on("connection", (socket) => {
 });
 app.use(express.json());
 app.use(express.static(path.join(process.env.ROOT, 'public')));
+app.use(cookieParser());
 app.use("/", viewsRouter);
+app.use(`/api/${process.env.API_VERSION}`, viewsRouter);
 server.listen(process.env.PORT, () => {
     log(`server is running on port ${process.env.PORT}`);
 });
