@@ -1,9 +1,11 @@
 import mongodb from 'mongodb';
 import bcrypt from 'bcrypt';
 
+const log = console.log;
+
 export default class DB {
     private static client: mongodb.MongoClient;
-    static async connect(func: (x: any) => void) {
+    static async connect(func: (x: mongodb.MongoClient) => void): Promise<void> {
         if (process.env.MONGODB_URL) {
             this.client = await mongodb.MongoClient.connect(process.env.MONGODB_URL);
             func(this.client);
@@ -12,8 +14,8 @@ export default class DB {
         }
     }
 
-    static async login(username: string, password: string) {
-        if (username == null || password == null || typeof username !== 'string' || typeof password !== 'string' || username.length > 5 || password.length > 7) {
+    static async login(username: any, password: any): Promise<null | mongodb.ObjectId> {
+        if (username == null || password == null || typeof username !== 'string' || typeof password !== 'string' || username.length < 6 || password.length < 8) {
             throw new Error("invalid input");
         }
 
@@ -22,21 +24,28 @@ export default class DB {
         if (!user) {
             throw new Error("can not find user");
         } else if (bcrypt.compareSync(password, user.password)) {
-            return user;
+            return user._id;
         } else {
             throw new Error("wrong password");
         }
     }
 
-    static async register(username: string, password: string) {
-        if (username == null || password == null || typeof username !== 'string' || typeof password !== 'string' || username.length > 5 || password.length > 7) {
+    static async register(username: string, password: string): Promise<null | mongodb.ObjectId> {
+        if (username == null || password == null || typeof username !== 'string' || typeof password !== 'string' || username.length < 6 || password.length < 8) {
             throw new Error("invalid input");
+        }
+
+        const user = await this.client.db("chatApp").collection("users").findOne({ username: username });
+
+        if (user) {
+            throw new Error("user exists");
         }
 
         const result = await this.client.db("chatApp").collection("users").insertOne({
             username,
-            password,
+            password: bcrypt.hashSync(password, 10),
             status: "",
+            //todo:add default chat_id for admin to send message to this user
             chats: [],
             created_at: new Date()
         });

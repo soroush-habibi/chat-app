@@ -6,6 +6,7 @@ import http from 'http';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import viewsRouter from './routes/viewsRoute.js';
+import apiRouter from './routes/apiRoute.js';
 let temp = path.dirname(fileURLToPath(import.meta.url)).split('');
 temp.splice(temp.length - 6);
 const ROOT = temp.join('');
@@ -24,7 +25,7 @@ app.use(express.json());
 app.use(express.static(path.join(process.env.ROOT, 'public')));
 app.use(cookieParser());
 app.use("/", viewsRouter);
-app.use(`/api/${process.env.API_VERSION}`, viewsRouter);
+app.use("/api", apiRouter);
 server.listen(process.env.PORT, () => {
     log(`server is running on port ${process.env.PORT}`);
 });

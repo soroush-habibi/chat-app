@@ -32,7 +32,7 @@ app.use(express.static(path.join(process.env.ROOT, 'public')));
 app.use(cookieParser());
 
 app.use("/", viewsRouter);
-app.use(`/api/${process.env.API_VERSION}`, viewsRouter);
+app.use("/api", apiRouter);
 
 server.listen(process.env.PORT, () => {
     log(`server is running on port ${process.env.PORT}`);
