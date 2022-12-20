@@ -1,4 +1,8 @@
 import express from 'express';
+import JWT from 'jsonwebtoken';
+
+import fs from 'fs';
+import path from 'path';
 
 import DB from "../models/mongo.js";
 
@@ -25,11 +29,22 @@ export default class controller {
             });
 
             if (userId) {
-                res.status(200).json({
-                    success: true,
-                    body: userId,
-                    message: "OK"
-                });
+                if (process.env.ROOT) {
+                    const token = JWT.sign({ username: req.query.username, password: req.query.password },
+                        fs.readFileSync(path.join(process.env.ROOT, "private.key")), { expiresIn: 604800000, algorithm: "RS256" });
+                    res.cookie("JWT", token, { expires: new Date(Date.now() + 604800000), httpOnly: true });
+                    res.status(200).json({
+                        success: true,
+                        body: userId,
+                        message: "OK"
+                    });
+                } else {
+                    res.status(500).json({
+                        success: false,
+                        body: null,
+                        message: "ROOT path is not exist in environment variables"
+                    });
+                }
             }
             client.close();
         }).catch(e => {

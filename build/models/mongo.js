@@ -38,9 +38,9 @@ export default class DB {
             username,
             password: bcrypt.hashSync(password, 10),
             status: "",
-            //todo:add default chat_id for admin to send message to this user
             chats: [],
-            created_at: new Date()
+            created_at: new Date(),
+            admin: false
         });
         if (result.acknowledged) {
             return result.insertedId;
