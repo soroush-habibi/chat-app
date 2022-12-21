@@ -81,6 +81,14 @@ export default class controller {
             });
         });
     }
+    static logOut(req, res) {
+        res.clearCookie("JWT");
+        res.status(200).json({
+            success: true,
+            body: null,
+            message: "OK"
+        });
+    }
     static invitePV(req, res) {
         DB.connect(async (client) => {
             const chatId = await DB.invitePV(res.locals.username, req.body.targetUser, req.body.pkey).catch(e => {
