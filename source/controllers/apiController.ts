@@ -156,6 +156,34 @@ export default class controller {
         });
     }
 
+    static declineInvitePV(req: express.Request, res: express.Response) {
+        DB.connect(async (client) => {
+            const result = await DB.declineInvitePV(res.locals.username, req.body.chatId).catch(e => {
+                res.status(400).json({
+                    success: false,
+                    body: null,
+                    message: e.message
+                });
+            });
+
+            if (result) {
+                res.status(200).json({
+                    success: true,
+                    body: req.body.chatId,
+                    message: "OK"
+                });
+            }
+
+            client.close();
+        }).catch(e => {
+            res.status(500).json({
+                success: false,
+                body: null,
+                message: e.message
+            });
+        });
+    }
+
     static getInvitesReceived(req: express.Request, res: express.Response) {
         DB.connect(async (client) => {
             const invites = await DB.getInvitesReceived(res.locals.username).catch(e => {

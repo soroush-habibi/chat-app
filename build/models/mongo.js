@@ -126,6 +126,24 @@ export default class DB {
             }
         }
     }
+    static async declineInvitePV(username, chatId) {
+        if (chatId == null || typeof chatId !== 'string' || chatId.length !== 16) {
+            throw new Error("invalid input");
+        }
+        const chat = await this.client.db("chatApp").collection("chats").findOne({ chat_id: chatId, receiver: username });
+        if (!chat) {
+            throw new Error("can not find invite");
+        }
+        else {
+            const result = await this.client.db("chatApp").collection("chats").deleteOne({ chat_id: chatId, receiver: username });
+            if (result.acknowledged && result.deletedCount === 1) {
+                return true;
+            }
+            else {
+                throw new Error("deleting document failed");
+            }
+        }
+    }
     static async getInvitesReceived(username) {
         const invites = await this.client.db("chatApp").collection("chats").find({ receiver: username }).project({ _id: 0, receiver: 0 }).toArray();
         return invites;
