@@ -91,4 +91,31 @@ export default class controller {
             });
         });
     }
+
+    static invitePV(req: express.Request, res: express.Response) {
+        DB.connect(async (client) => {
+            const id = await DB.invitePV(res.locals.username, req.body.targetUser, req.body.pkey).catch(e => {
+                res.status(400).json({
+                    success: false,
+                    body: null,
+                    message: e.message
+                });
+            });
+
+            if (id) {
+                res.status(200).json({
+                    success: true,
+                    body: id,
+                    message: "OK"
+                });
+            }
+            client.close();
+        }).catch(e => {
+            res.status(500).json({
+                success: false,
+                body: null,
+                message: e.message
+            });
+        });
+    }
 }

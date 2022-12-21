@@ -50,16 +50,30 @@ export default class DB {
             throw new Error("inserting failed");
         }
     }
-    static async invitePV(username, password, targetUser, pkey) {
+    static async invitePV(username, targetUser, pkey) {
         if (targetUser == null || pkey == null || typeof targetUser !== 'string' || typeof pkey !== 'string' || targetUser.length < 6) {
             throw new Error("invalid input");
         }
-        await DB.login(username, password).catch(e => {
-            throw new Error(e.message);
-        });
+        if (username == targetUser) {
+            throw new Error("you can not invite yourself");
+        }
         const target = await this.client.db("chatApp").collection("users").findOne({ username: targetUser });
+        const pendingInvite = await this.client.db("chatApp").collection("chats").findOne({ receiver: targetUser, users: { $elemMatch: { username: username } } });
+        const pendingInvite2 = await this.client.db("chatApp").collection("chats").findOne({ receiver: username, users: { $elemMatch: { username: targetUser } } });
+        const chat = await this.client.db("chatApp").collection("chats").findOne({ $and: [{ users: { $elemMatch: { username: username } } }, { users: { $elemMatch: { username: targetUser } } }] });
+        log(pendingInvite, pendingInvite2, chat);
         if (!target) {
             throw new Error("can not find target user");
+        }
+        else if (pendingInvite) {
+            throw new Error("invite pending");
+        }
+        else if (pendingInvite2) {
+            //todo this part should accept invite instead of throwing error
+            throw new Error("you should accept this user invite");
+        }
+        else if (chat) {
+            throw new Error("you are already in chat with this user");
         }
         else {
             let chatId;
@@ -81,6 +95,32 @@ export default class DB {
             }
             else {
                 throw new Error("inserting failed");
+            }
+        }
+    }
+    static async acceptInvitePV(username, chatId, pkey) {
+        if (chatId == null || pkey == null || typeof chatId !== 'string' || typeof pkey !== "string" || chatId.length !== 16) {
+            throw new Error("invalid input");
+        }
+        const chat = await this.client.db("chatApp").collection("chats").findOne({ chat_id: chatId, receiver: username });
+        if (!chat) {
+            throw new Error("can not find invite");
+        }
+        else {
+            const result = await this.client.db("chatApp").collection("chats").updateOne({ chat_id: chatId, receiver: username }, {
+                $unset: {
+                    receiver: ""
+                },
+                $push: {
+                    username: username,
+                    pkey: pkey
+                }
+            });
+            if (result.acknowledged && result.modifiedCount === 1) {
+                return true;
+            }
+            else {
+                return false;
             }
         }
     }
