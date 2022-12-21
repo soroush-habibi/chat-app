@@ -59,7 +59,7 @@ export default class DB {
         }
     }
 
-    static async invitePV(username: string, targetUser: string, pkey: string): Promise<null | mongodb.ObjectId> {
+    static async invitePV(username: string, targetUser: string, pkey: string): Promise<null | string> {
         if (targetUser == null || pkey == null || typeof targetUser !== 'string' || typeof pkey !== 'string' || targetUser.length < 6) {
             throw new Error("invalid input");
         }
@@ -103,7 +103,7 @@ export default class DB {
                 receiver: targetUser
             });
             if (result.acknowledged) {
-                return result.insertedId;
+                return chatId;
             } else {
                 throw new Error("inserting failed");
             }
@@ -115,6 +115,7 @@ export default class DB {
             throw new Error("invalid input");
         }
 
+        log(chatId, username)
         const chat = await this.client.db("chatApp").collection("chats").findOne({ chat_id: chatId, receiver: username });
 
         if (!chat) {
@@ -125,15 +126,17 @@ export default class DB {
                     receiver: ""
                 },
                 $push: {
-                    username: username,
-                    pkey: pkey
+                    users: {
+                        username: username,
+                        pkey: pkey
+                    }
                 }
             });
 
             if (result.acknowledged && result.modifiedCount === 1) {
                 return true;
             } else {
-                return false;
+                throw new Error("updating document failed");
             }
         }
     }

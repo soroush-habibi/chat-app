@@ -83,17 +83,42 @@ export default class controller {
     }
     static invitePV(req, res) {
         DB.connect(async (client) => {
-            const id = await DB.invitePV(res.locals.username, req.body.targetUser, req.body.pkey).catch(e => {
+            const chatId = await DB.invitePV(res.locals.username, req.body.targetUser, req.body.pkey).catch(e => {
                 res.status(400).json({
                     success: false,
                     body: null,
                     message: e.message
                 });
             });
-            if (id) {
+            if (chatId) {
                 res.status(200).json({
                     success: true,
-                    body: id,
+                    body: chatId,
+                    message: "OK"
+                });
+            }
+            client.close();
+        }).catch(e => {
+            res.status(500).json({
+                success: false,
+                body: null,
+                message: e.message
+            });
+        });
+    }
+    static acceptInvitePV(req, res) {
+        DB.connect(async (client) => {
+            const result = await DB.acceptInvitePV(res.locals.username, req.body.chatId, req.body.pkey).catch(e => {
+                res.status(400).json({
+                    success: false,
+                    body: null,
+                    message: e.message
+                });
+            });
+            if (result) {
+                res.status(200).json({
+                    success: true,
+                    body: req.body.chatId,
                     message: "OK"
                 });
             }

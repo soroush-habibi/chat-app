@@ -91,7 +91,7 @@ export default class DB {
                 receiver: targetUser
             });
             if (result.acknowledged) {
-                return result.insertedId;
+                return chatId;
             }
             else {
                 throw new Error("inserting failed");
@@ -102,6 +102,7 @@ export default class DB {
         if (chatId == null || pkey == null || typeof chatId !== 'string' || typeof pkey !== "string" || chatId.length !== 16) {
             throw new Error("invalid input");
         }
+        log(chatId, username);
         const chat = await this.client.db("chatApp").collection("chats").findOne({ chat_id: chatId, receiver: username });
         if (!chat) {
             throw new Error("can not find invite");
@@ -112,15 +113,17 @@ export default class DB {
                     receiver: ""
                 },
                 $push: {
-                    username: username,
-                    pkey: pkey
+                    users: {
+                        username: username,
+                        pkey: pkey
+                    }
                 }
             });
             if (result.acknowledged && result.modifiedCount === 1) {
                 return true;
             }
             else {
-                return false;
+                throw new Error("updating document failed");
             }
         }
     }
