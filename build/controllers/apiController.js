@@ -141,7 +141,7 @@ export default class controller {
     }
     static declineInvitePV(req, res) {
         DB.connect(async (client) => {
-            const result = await DB.declineInvitePV(res.locals.username, req.body.chatId).catch(e => {
+            const result = await DB.declineInvitePV(res.locals.username, req.query.chatId).catch(e => {
                 res.status(400).json({
                     success: false,
                     body: null,
@@ -151,7 +151,7 @@ export default class controller {
             if (result) {
                 res.status(200).json({
                     success: true,
-                    body: req.body.chatId,
+                    body: req.query.chatId,
                     message: "OK"
                 });
             }

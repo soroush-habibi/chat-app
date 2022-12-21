@@ -192,3 +192,13 @@ li {
     display: flex;
     justify-content: space-between;
 }
+
+.accept:hover {
+    color: #68ee68;
+    cursor: pointer;
+}
+
+.decline:hover {
+    color: #d9534f;
+    cursor: pointer;
+}

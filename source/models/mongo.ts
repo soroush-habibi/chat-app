@@ -140,7 +140,7 @@ export default class DB {
         }
     }
 
-    static async declineInvitePV(username: string, chatId: string): Promise<null | boolean> {
+    static async declineInvitePV(username: string, chatId: any): Promise<null | boolean> {
         if (chatId == null || typeof chatId !== 'string' || chatId.length !== 16) {
             throw new Error("invalid input");
         }

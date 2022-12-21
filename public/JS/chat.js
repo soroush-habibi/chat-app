@@ -4,6 +4,8 @@ const gp = io("/gp");
 const form = document.querySelector("form");
 const logOutBtn = document.getElementById("log-out");
 const invitesUl = document.getElementById("invites");
+let acceptBtn;
+let declineBtn;
 
 form.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -23,7 +25,26 @@ document.addEventListener("DOMContentLoaded", async (e) => {
     for (let i of invites) {
         invitesUl.appendChild(i);
     }
-})
+
+    acceptBtn = document.querySelectorAll(".accept");
+    declineBtn = document.querySelectorAll(".decline");
+
+    for (let i of acceptBtn) {
+        i.addEventListener('click', async (e) => {
+            const response = await axios.put("api/accept-invite-pv", { chatId: e.currentTarget.parentNode.parentNode.dataset.chatId, pkey: "test" });
+            const data = await response.data;
+            console.log(data);
+        });
+    }
+
+    for (let i of declineBtn) {
+        i.addEventListener('click', async (e) => {
+            const response = await axios.delete(`api/decline-invite-pv?chatId=${encodeURIComponent(e.currentTarget.parentNode.parentNode.dataset.chatId)}`);
+            const data = await response.data;
+            console.log(data);
+        });
+    }
+});
 
 async function getInvitesPV() {
     let result = [];
