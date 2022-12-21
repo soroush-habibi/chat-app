@@ -6,4 +6,5 @@ router.get('/login', apiController.login);
 router.post('/register', apiController.register);
 router.post("/invite-pv", viewsController.authorization, apiController.invitePV);
 router.put("/accept-invite-pv", viewsController.authorization, apiController.acceptInvitePV);
+router.get("/get-invites-received", viewsController.authorization, apiController.getInvitesReceived);
 export default router;

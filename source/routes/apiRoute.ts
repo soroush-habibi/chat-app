@@ -14,4 +14,6 @@ router.post("/invite-pv", viewsController.authorization, apiController.invitePV)
 
 router.put("/accept-invite-pv", viewsController.authorization, apiController.acceptInvitePV);
 
+router.get("/get-invites-received", viewsController.authorization, apiController.getInvitesReceived);
+
 export default router;

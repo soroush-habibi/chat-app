@@ -115,7 +115,6 @@ export default class DB {
             throw new Error("invalid input");
         }
 
-        log(chatId, username)
         const chat = await this.client.db("chatApp").collection("chats").findOne({ chat_id: chatId, receiver: username });
 
         if (!chat) {
@@ -139,5 +138,10 @@ export default class DB {
                 throw new Error("updating document failed");
             }
         }
+    }
+
+    static async getInvitesReceived(username: string): Promise<object[]> {
+        const invites = await this.client.db("chatApp").collection("chats").find({ receiver: username }).project({ _id: 0, receiver: 0 }).toArray();
+        return invites;
     }
 }

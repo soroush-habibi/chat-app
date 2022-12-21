@@ -131,4 +131,29 @@ export default class controller {
             });
         });
     }
+    static getInvitesReceived(req, res) {
+        DB.connect(async (client) => {
+            const invites = await DB.getInvitesReceived(res.locals.username).catch(e => {
+                res.status(400).json({
+                    success: false,
+                    body: null,
+                    message: e.message
+                });
+            });
+            if (invites) {
+                res.status(200).json({
+                    success: true,
+                    body: invites,
+                    message: "OK"
+                });
+            }
+            client.close();
+        }).catch(e => {
+            res.status(500).json({
+                success: false,
+                body: null,
+                message: e.message
+            });
+        });
+    }
 }
