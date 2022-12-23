@@ -72,9 +72,24 @@ a {
 
 .chat-sidebar h2 {
     font-size: 20px;
-    background: rgba(0, 0, 0, 0.1);
     padding: 10px;
     margin-bottom: 20px;
+}
+
+#invite-form-input {
+    font-size: 16px;
+    padding: 5px;
+    height: 30px;
+    margin-bottom: 10px;
+    flex: 1;
+}
+
+#send-invite {
+    margin-bottom: 20px;
+}
+
+.selected {
+    background-color: rgba(0, 0, 0, 0.1);
 }
 
 .chat-sidebar h3 {

@@ -1,14 +1,29 @@
 const pv = io("/pv");
 const gp = io("/gp");
 
-const form = document.querySelector("form");
+const chatForm = document.getElementById("chat-form");
+const inviteForm = document.getElementById("invite-form");
+const inviteFormInput = document.getElementById("invite-form-input");
 const logOutBtn = document.getElementById("log-out");
 const invitesUl = document.getElementById("invites");
 let acceptBtn;
 let declineBtn;
 
-form.addEventListener('submit', async (e) => {
+chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+});
+
+inviteForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = inviteFormInput.value;
+    try {
+        const response = await axios.post("api/invite-pv", { targetUser: username, pkey: "test" });
+        const data = await response.data;
+        alert(data.body);
+    } catch (e) {
+        alert(e.response.data.message);
+    }
 });
 
 logOutBtn.addEventListener('click', async (e) => {
