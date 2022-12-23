@@ -16,7 +16,7 @@ router.post("/invite-pv", viewsController.authorization, apiController.invitePV)
 
 router.put("/accept-invite-pv", viewsController.authorization, apiController.acceptInvitePV);
 
-router.delete("/decline-invite-pv", viewsController.authorization, apiController.declineInvitePV);
+router.delete("/decline-invite-pv/:chatId", viewsController.authorization, apiController.declineInvitePV);
 
 router.get("/get-invites-received", viewsController.authorization, apiController.getInvitesReceived);
 

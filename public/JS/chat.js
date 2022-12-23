@@ -39,7 +39,7 @@ document.addEventListener("DOMContentLoaded", async (e) => {
 
     for (let i of declineBtn) {
         i.addEventListener('click', async (e) => {
-            const response = await axios.delete(`api/decline-invite-pv?chatId=${encodeURIComponent(e.currentTarget.parentNode.parentNode.dataset.chatId)}`);
+            const response = await axios.delete(`api/decline-invite-pv/${encodeURIComponent(e.currentTarget.parentNode.parentNode.dataset.chatId)}`);
             const data = await response.data;
             console.log(data);
         });

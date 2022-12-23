@@ -39,7 +39,6 @@ export default class DB {
             username,
             password: bcrypt.hashSync(password, 10),
             status: "",
-            chats: [],
             created_at: new Date(),
             admin: false
         });
@@ -88,6 +87,7 @@ export default class DB {
                         pkey: pkey
                     }
                 ],
+                messages: [],
                 receiver: targetUser
             });
             if (result.acknowledged) {
@@ -145,7 +145,7 @@ export default class DB {
         }
     }
     static async getInvitesReceived(username) {
-        const invites = await this.client.db("chatApp").collection("chats").find({ receiver: username }).project({ _id: 0, receiver: 0 }).toArray();
+        const invites = await this.client.db("chatApp").collection("chats").find({ receiver: username }).project({ _id: 0, messages: 0, receiver: 0 }).toArray();
         return invites;
     }
 }
