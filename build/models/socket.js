@@ -6,6 +6,7 @@ export default class socketIo {
     static joinEvent() {
         this.socket.on("join", (rooms) => {
             for (let i of rooms) {
+                log(i);
                 this.socket.join(i);
             }
         });
@@ -14,5 +15,8 @@ export default class socketIo {
         for (let i of rooms) {
             this.socket.join(i);
         }
+    }
+    static sendInvite(username, targetUser, chatId) {
+        this.socket.to(targetUser).emit("invite", username, chatId);
     }
 }

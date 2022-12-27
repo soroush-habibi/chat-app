@@ -1,5 +1,9 @@
 const socket = io();
 
+socket.on("invite", async (sender, chatId) => {
+    addInvite(sender, chatId);
+});
+
 const chatForm = document.getElementById("chat-form");
 const inviteForm = document.getElementById("invite-form");
 const inviteFormInput = document.getElementById("invite-form-input");
@@ -69,7 +73,6 @@ document.addEventListener("DOMContentLoaded", async (e) => {
         i.addEventListener('click', async (e) => {
             const response = await axios.put("api/accept-invite-pv", { chatId: e.currentTarget.parentNode.parentNode.id, pkey: "test" });
             const data = await response.data;
-            console.log(data);
         });
     }
 
@@ -77,10 +80,31 @@ document.addEventListener("DOMContentLoaded", async (e) => {
         i.addEventListener('click', async (e) => {
             const response = await axios.delete(`api/decline-invite-pv/${encodeURIComponent(e.currentTarget.parentNode.parentNode.id)}`);
             const data = await response.data;
-            console.log(data);
         });
     }
 });
+
+function addInvite(username, chatId) {
+    console.log("not ok");
+    const li = document.createElement("li");
+    li.id = chatId;
+    li.innerHTML = username;
+    li.innerHTML += `<div>
+    <i class="fas fa-check accept"></i>
+    <i class="fas fa-ban decline"></i>
+</div>`;
+    invitesUl.appendChild(li);
+
+    invitesUl.querySelector(`#${chatId}`).querySelector(".accept").addEventListener('click', async (e) => {
+        const response = await axios.put("api/accept-invite-pv", { chatId: e.currentTarget.parentNode.parentNode.id, pkey: "test" });
+        const data = await response.data;
+    });
+
+    invitesUl.querySelector(`#${chatId}`).querySelector(".decline").addEventListener('click', async (e) => {
+        const response = await axios.delete(`api/decline-invite-pv/${encodeURIComponent(e.currentTarget.parentNode.parentNode.id)}`);
+        const data = await response.data;
+    });
+}
 
 async function getInvitesPV() {
     let result = [];
