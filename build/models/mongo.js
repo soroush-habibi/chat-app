@@ -60,7 +60,6 @@ export default class DB {
         const pendingInvite = await this.client.db("chatApp").collection("chats").findOne({ receiver: targetUser, users: { $elemMatch: { username: username } } });
         const pendingInvite2 = await this.client.db("chatApp").collection("chats").findOne({ receiver: username, users: { $elemMatch: { username: targetUser } } });
         const chat = await this.client.db("chatApp").collection("chats").findOne({ $and: [{ users: { $elemMatch: { username: username } } }, { users: { $elemMatch: { username: targetUser } } }] });
-        log(pendingInvite, pendingInvite2, chat);
         if (!target) {
             throw new Error("can not find target user");
         }
@@ -147,5 +146,9 @@ export default class DB {
     static async getInvitesReceived(username) {
         const invites = await this.client.db("chatApp").collection("chats").find({ receiver: username }).project({ _id: 0, messages: 0, receiver: 0 }).toArray();
         return invites;
+    }
+    static async getChats(username) {
+        const chats = await this.client.db("chatApp").collection("chats").find({ users: { $elemMatch: { username: username } } }).project({ _id: 0, messages: 0 }).toArray();
+        return chats;
     }
 }

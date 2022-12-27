@@ -6,6 +6,7 @@ const inviteForm = document.getElementById("invite-form");
 const inviteFormInput = document.getElementById("invite-form-input");
 const logOutBtn = document.getElementById("log-out");
 const invitesUl = document.getElementById("invites");
+const chats = document.getElementById("chats");
 let acceptBtn;
 let declineBtn;
 
@@ -20,7 +21,14 @@ inviteForm.addEventListener('submit', async (e) => {
     try {
         const response = await axios.post("api/invite-pv", { targetUser: username, pkey: "test" });
         const data = await response.data;
-        alert(data.body);
+        if (data.success) {
+            const h2 = document.createElement('h2');
+            h2.innerHTML = `<h2 class="selected">${username}</h2>`;
+            h2.dataset.chatId = data.body;
+            chats.appendChild(h2);
+        } else {
+            alert(data.message);
+        }
     } catch (e) {
         alert(e.response.data.message);
     }
@@ -79,3 +87,7 @@ async function getInvitesPV() {
 
     return result;
 }
+
+// async function getChats(){
+//     let result = 
+// }

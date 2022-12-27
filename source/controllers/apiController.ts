@@ -211,4 +211,32 @@ export default class controller {
             });
         });
     }
+
+    static getChats(req: express.Request, res: express.Response) {
+        DB.connect(async (client) => {
+            const chats = await DB.getChats(res.locals.username).catch(e => {
+                res.status(400).json({
+                    success: false,
+                    body: null,
+                    message: e.message
+                });
+            });
+
+            if (chats) {
+                res.status(200).json({
+                    success: true,
+                    body: chats,
+                    message: "OK"
+                });
+            }
+
+            client.close();
+        }).catch(e => {
+            res.status(500).json({
+                success: false,
+                body: null,
+                message: e.message
+            });
+        });
+    }
 }

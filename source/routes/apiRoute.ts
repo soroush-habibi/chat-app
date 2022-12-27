@@ -20,4 +20,6 @@ router.delete("/decline-invite-pv/:chatId", viewsController.authorization, apiCo
 
 router.get("/get-invites-received", viewsController.authorization, apiController.getInvitesReceived);
 
+router.get("/get-chats", viewsController.authorization, apiController.getChats);
+
 export default router;
