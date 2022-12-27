@@ -2,6 +2,7 @@ import JWT from 'jsonwebtoken';
 import fs from 'fs';
 import path from 'path';
 import DB from "../models/mongo.js";
+import socketModule from '../models/socket.js';
 const log = console.log;
 export default class controller {
     static login(req, res) {
@@ -99,6 +100,7 @@ export default class controller {
                 });
             });
             if (chatId) {
+                socketModule.joinManual([chatId]);
                 res.status(200).json({
                     success: true,
                     body: chatId,

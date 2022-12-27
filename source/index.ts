@@ -1,6 +1,6 @@
 import 'dotenv/config';
 import express from 'express';
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import cookieParser from 'cookie-parser';
 
 import http from 'http';
@@ -9,23 +9,22 @@ import { fileURLToPath } from 'url';
 
 import viewsRouter from './routes/viewsRoute.js';
 import apiRouter from './routes/apiRoute.js';
+import socketModule from './models/socket.js';
 
 let temp: string[] = path.dirname(fileURLToPath(import.meta.url)).split('');
 temp.splice(temp.length - 6);
 const ROOT = temp.join('');
 process.env.ROOT = ROOT;
-const log: (x: any) => void = console.log;
+const log = console.log;
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-io.of("/pv").on("connection", (socket) => {
-    log("someone connect to PV with id " + socket.id)
-});
-
-io.of("/gp").on("connection", (socket) => {
-    log("someone connect to GP with id " + socket.id)
-});
+io.on("connection", (socket) => {
+    log("someone connect to PV with id " + socket.id);
+    socketModule.register(socket);
+    socketModule.joinEvent();
+})
 
 app.use(express.json());
 app.use(express.static(path.join(process.env.ROOT, 'public')));

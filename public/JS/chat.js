@@ -1,5 +1,4 @@
-const pv = io("/pv");
-const gp = io("/gp");
+const socket = io();
 
 const chatForm = document.getElementById("chat-form");
 const inviteForm = document.getElementById("invite-form");
@@ -43,12 +42,17 @@ document.addEventListener("DOMContentLoaded", async (e) => {
         const response = await axios.get("api/username");
         const data = await response.data;
         currentUsername = data.body;
+        socket.emit("join", [currentUsername]);
     } catch (e) {
         alert(e);
         location.reload();
     }
     const invites = await getInvitesPV();
     const chats = await getChats(currentUsername);
+
+    socket.emit("join", chats.map((value) => {
+        return value.id;
+    }));
 
     for (let i of invites) {
         invitesUl.appendChild(i);
@@ -109,6 +113,7 @@ async function getChats(username) {
         let targetUser;
         if (i.receiver) {
             targetUser = i.receiver + "(Pending Invite)";
+            h2.setAttribute('class', 'pending');
         } else {
             for (let j of i.users) {
                 if (j.username !== username) {
