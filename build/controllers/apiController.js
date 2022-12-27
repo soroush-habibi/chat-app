@@ -214,4 +214,11 @@ export default class controller {
             });
         });
     }
+    static currentUsername(req, res) {
+        res.status(200).json({
+            success: true,
+            body: res.locals.username,
+            message: "OK"
+        });
+    }
 }

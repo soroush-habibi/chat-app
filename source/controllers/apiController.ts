@@ -239,4 +239,12 @@ export default class controller {
             });
         });
     }
+
+    static currentUsername(req: express.Request, res: express.Response) {
+        res.status(200).json({
+            success: true,
+            body: res.locals.username,
+            message: "OK"
+        });
+    }
 }
