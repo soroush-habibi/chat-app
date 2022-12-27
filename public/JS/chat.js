@@ -23,10 +23,12 @@ inviteForm.addEventListener('submit', async (e) => {
 
     const username = inviteFormInput.value;
     try {
-        const response = await axios.post("api/invite-pv", { targetUser: username, pkey: "test" });
+        const response = await axios.post("api/invite-pv", { targetUser: username });
         const data = await response.data;
         if (!data.success) {
             alert(data.message);
+        } else {
+            localStorage.setItem(data.body.chat_id, data.body.privateKey);
         }
     } catch (e) {
         alert(e.response.data.message);
@@ -71,8 +73,13 @@ document.addEventListener("DOMContentLoaded", async (e) => {
 
     for (let i of acceptBtn) {
         i.addEventListener('click', async (e) => {
-            const response = await axios.put("api/accept-invite-pv", { chatId: e.currentTarget.parentNode.parentNode.id, pkey: "test" });
+            const response = await axios.put("api/accept-invite-pv", { chatId: e.currentTarget.parentNode.parentNode.id });
             const data = await response.data;
+            if (!data.success) {
+                console.log(data.message);
+            } else {
+                localStorage.setItem(data.body.chat_id, data.body.privateKey);
+            }
         });
     }
 
@@ -96,8 +103,13 @@ function addInvite(username, chatId) {
     invitesUl.appendChild(li);
 
     invitesUl.querySelector(`#${chatId}`).querySelector(".accept").addEventListener('click', async (e) => {
-        const response = await axios.put("api/accept-invite-pv", { chatId: e.currentTarget.parentNode.parentNode.id, pkey: "test" });
+        const response = await axios.put("api/accept-invite-pv", { chatId: e.currentTarget.parentNode.parentNode.id });
         const data = await response.data;
+        if (!data.success) {
+            console.log(data.message);
+        } else {
+            localStorage.setItem(data.body.chat_id, data.body.privateKey);
+        }
     });
 
     invitesUl.querySelector(`#${chatId}`).querySelector(".decline").addEventListener('click', async (e) => {

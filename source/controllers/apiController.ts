@@ -3,6 +3,7 @@ import JWT from 'jsonwebtoken';
 
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
 
 import DB from "../models/mongo.js";
 import socketModule from '../models/socket.js';
@@ -103,8 +104,21 @@ export default class controller {
     }
 
     static invitePV(req: express.Request, res: express.Response) {
+        const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
+            modulusLength: 4096,
+            publicKeyEncoding: {
+                type: 'spki',
+                format: 'pem',
+            },
+            privateKeyEncoding: {
+                type: 'pkcs8',
+                format: 'pem',
+                cipher: 'aes-256-cbc',
+                passphrase: 'top secret',
+            }
+        });
         DB.connect(async (client) => {
-            const chatId = await DB.invitePV(res.locals.username, req.body.targetUser, req.body.pkey).catch(e => {
+            const chatId = await DB.invitePV(res.locals.username, req.body.targetUser, publicKey).catch(e => {
                 res.status(400).json({
                     success: false,
                     body: null,
@@ -117,7 +131,7 @@ export default class controller {
                 socketModule.sendInvite(res.locals.username, req.body.targetUser, chatId);
                 res.status(200).json({
                     success: true,
-                    body: chatId,
+                    body: { chat_id: chatId, privateKey },
                     message: "OK"
                 });
             }
@@ -132,8 +146,21 @@ export default class controller {
     }
 
     static acceptInvitePV(req: express.Request, res: express.Response) {
+        const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
+            modulusLength: 4096,
+            publicKeyEncoding: {
+                type: 'spki',
+                format: 'pem',
+            },
+            privateKeyEncoding: {
+                type: 'pkcs8',
+                format: 'pem',
+                cipher: 'aes-256-cbc',
+                passphrase: 'top secret',
+            }
+        });
         DB.connect(async (client) => {
-            const result = await DB.acceptInvitePV(res.locals.username, req.body.chatId, req.body.pkey).catch(e => {
+            const result = await DB.acceptInvitePV(res.locals.username, req.body.chatId, publicKey).catch(e => {
                 res.status(400).json({
                     success: false,
                     body: null,
@@ -144,7 +171,7 @@ export default class controller {
             if (result) {
                 res.status(200).json({
                     success: true,
-                    body: req.body.chatId,
+                    body: { chat_id: req.body.chatId, privateKey },
                     message: "OK"
                 });
             }
