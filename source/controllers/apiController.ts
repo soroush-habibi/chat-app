@@ -169,6 +169,7 @@ export default class controller {
             });
 
             if (result) {
+                socketModule.joinManual([req.body.chatId]);
                 res.status(200).json({
                     success: true,
                     body: { chat_id: req.body.chatId, privateKey },

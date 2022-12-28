@@ -20,6 +20,8 @@ io.on("connection", (socket) => {
     log("someone connect to PV with id " + socket.id);
     socketModule.register(socket);
     socketModule.joinEvent();
+    socketModule.acceptInvite();
+    socketModule.declineInvite();
 });
 app.use(express.json());
 app.use(express.static(path.join(process.env.ROOT, 'public')));

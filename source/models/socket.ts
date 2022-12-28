@@ -10,20 +10,28 @@ export default class socketIo {
 
     static joinEvent() {
         this.socket.on("join", (rooms: string[]) => {
-            for (let i of rooms) {
-                log(i);
-                this.socket.join(i);
-            }
+            this.socket.join(rooms);
         });
     }
 
     static joinManual(rooms: string[]) {
-        for (let i of rooms) {
-            this.socket.join(i);
-        }
+        this.socket.join(rooms);
     }
 
     static sendInvite(username: string, targetUser: string, chatId: string) {
         this.socket.to(targetUser).emit("invite", username, chatId);
+    }
+
+    static acceptInvite() {
+        this.socket.on("acceptInvite", (chatId: string) => {
+            this.socket.emit("acceptInvite", chatId);
+        });
+    }
+
+    static declineInvite() {
+        this.socket.on("declineInvite", (chatId: string) => {
+            log("got it")
+            this.socket.emit("declineInvite", chatId);
+        });
     }
 }
