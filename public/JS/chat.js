@@ -14,6 +14,8 @@ let acceptBtn;
 let declineBtn;
 let currentUsername;
 
+let activeChat = null;
+
 chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 });
@@ -29,6 +31,7 @@ inviteForm.addEventListener('submit', async (e) => {
             alert(data.message);
         } else {
             localStorage.setItem(data.body.chat_id, data.body.privateKey);
+            addChat(username, data.body.chat_id, true);
         }
     } catch (e) {
         alert(e.response.data.message);
@@ -73,26 +76,34 @@ document.addEventListener("DOMContentLoaded", async (e) => {
 
     for (let i of acceptBtn) {
         i.addEventListener('click', async (e) => {
-            const response = await axios.put("api/accept-invite-pv", { chatId: e.currentTarget.parentNode.parentNode.id });
+            const target = e.currentTarget;
+            const response = await axios.put("api/accept-invite-pv", { chatId: target.parentNode.parentNode.id });
             const data = await response.data;
             if (!data.success) {
                 console.log(data.message);
             } else {
                 localStorage.setItem(data.body.chat_id, data.body.privateKey);
+                removeInvite(target.parentNode.parentNode.id);
+                addChat(target.parentNode.parentNode.innerHTML.split("<div>")[0], target.parentNode.parentNode.id, false);
             }
         });
     }
 
     for (let i of declineBtn) {
         i.addEventListener('click', async (e) => {
-            const response = await axios.delete(`api/decline-invite-pv/${encodeURIComponent(e.currentTarget.parentNode.parentNode.id)}`);
+            const target = e.currentTarget;
+            const response = await axios.delete(`api/decline-invite-pv/${encodeURIComponent(target.parentNode.parentNode.id)}`);
             const data = await response.data;
+            if (!data.success) {
+                console.log(data.message);
+            } else {
+                removeInvite(target.parentNode.parentNode.id);
+            }
         });
     }
 });
 
 function addInvite(username, chatId) {
-    console.log("not ok");
     const li = document.createElement("li");
     li.id = chatId;
     li.innerHTML = username;
@@ -103,19 +114,33 @@ function addInvite(username, chatId) {
     invitesUl.appendChild(li);
 
     invitesUl.querySelector(`#${chatId}`).querySelector(".accept").addEventListener('click', async (e) => {
-        const response = await axios.put("api/accept-invite-pv", { chatId: e.currentTarget.parentNode.parentNode.id });
+        const target = e.currentTarget;
+        const response = await axios.put("api/accept-invite-pv", { chatId: target.parentNode.parentNode.id });
         const data = await response.data;
         if (!data.success) {
             console.log(data.message);
         } else {
             localStorage.setItem(data.body.chat_id, data.body.privateKey);
+            removeInvite(target.parentNode.parentNode.id);
+            addChat(target.parentNode.parentNode.innerHTML.split("<div>")[0], target.parentNode.parentNode.id, false);
         }
     });
 
     invitesUl.querySelector(`#${chatId}`).querySelector(".decline").addEventListener('click', async (e) => {
-        const response = await axios.delete(`api/decline-invite-pv/${encodeURIComponent(e.currentTarget.parentNode.parentNode.id)}`);
+        const target = e.currentTarget;
+        const response = await axios.delete(`api/decline-invite-pv/${encodeURIComponent(target.parentNode.parentNode.id)}`);
         const data = await response.data;
+        if (!data.success) {
+            console.log(data.message);
+        } else {
+            removeInvite(target.parentNode.parentNode.id);
+        }
     });
+}
+
+function removeInvite(chatId) {
+    const invite = document.querySelector("ul").querySelector(`#${chatId}`);
+    invite.remove();
 }
 
 async function getInvitesPV() {
@@ -137,6 +162,23 @@ async function getInvitesPV() {
     return result;
 }
 
+function addChat(username, chatId, pending) {
+    const h2 = document.createElement("h2");
+    h2.id = chatId;
+
+    let targetUser;
+    if (pending) {
+        targetUser = username + "(Pending Invite)";
+        h2.setAttribute('class', 'pending');
+    } else {
+        h2.setAttribute('class', 'active');
+        targetUser = username;
+    }
+
+    h2.innerHTML = targetUser;
+    chatsDiv.appendChild(h2);
+}
+
 async function getChats(username) {
     let result = [];
     const response = await axios.get("api/get-chats");
@@ -151,6 +193,7 @@ async function getChats(username) {
             targetUser = i.receiver + "(Pending Invite)";
             h2.setAttribute('class', 'pending');
         } else {
+            h2.setAttribute('class', 'active');
             for (let j of i.users) {
                 if (j.username !== username) {
                     targetUser = j.username;

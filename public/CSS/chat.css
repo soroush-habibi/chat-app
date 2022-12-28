@@ -92,6 +92,10 @@ a {
     color: rgba(255, 255, 255, 0.582);
 }
 
+.active {
+    cursor: pointer;
+}
+
 .selected {
     background-color: rgba(255, 255, 255, 0.719);
 }
