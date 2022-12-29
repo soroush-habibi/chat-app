@@ -159,17 +159,22 @@ export default class DB {
         if (!exists) {
             throw new Error("chat doesn't exists");
         }
+        const time = new Date();
         const result = await this.client.db("chatApp").collection("chats").updateOne({ chat_id: chatId, users: { $elemMatch: { username: username } } }, {
             $push: {
                 messages: {
                     sender: username,
-                    time: new Date(),
+                    time: time,
                     message: message
                 }
             }
         });
         if (result.acknowledged && result.modifiedCount === 1) {
-            return true;
+            return {
+                sender: username,
+                time: time,
+                message: message
+            };
         }
         else {
             throw new Error("updating document failed");

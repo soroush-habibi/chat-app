@@ -264,7 +264,7 @@ export default class controller {
             if (result) {
                 res.status(200).json({
                     success: true,
-                    body: null,
+                    body: result,
                     message: "OK"
                 });
             }

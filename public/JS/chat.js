@@ -16,7 +16,6 @@ socket.on("acceptInvite", (chatId) => {
 
 socket.on("declineInvite", (chatId) => {
     const chat = document.querySelector("#chats").querySelector(`#${chatId}`);
-    console.log(chat);
     if (chat) {
         chat.remove();
     }
@@ -30,6 +29,7 @@ const invitesUl = document.getElementById("invites");
 const chatsDiv = document.getElementById("chats");
 const loadingText = document.getElementById("loading-text");
 const messagesDiv = document.querySelector(".chat-messages");
+const chatInput = document.getElementById("msg");
 let acceptBtn;
 let declineBtn;
 let currentUsername;
@@ -40,6 +40,27 @@ let activeChat = null;
 
 chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
+
+    if (!currentChat) {
+        alert("You must open a chat");
+    } else {
+        loading = true;
+        try {
+            const response = await axios.post("api/messages", { chatId: currentChat, message: chatInput.value });
+            const data = await response.data;
+
+            const message = document.createElement("div");
+            message.classList.add("message")
+            message.innerHTML = `<p class="meta">${data.body.sender} <span>${data.body.time}</span></p>
+    <p class="text">
+        ${data.body.message}
+    </p>`
+            messagesDiv.appendChild(message);
+        } catch (e) {
+            alert(e.response.data.message);
+        }
+        loading = false;
+    }
 });
 
 inviteForm.addEventListener('submit', async (e) => {
