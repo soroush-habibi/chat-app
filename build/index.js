@@ -27,7 +27,14 @@ io.on("connection", (socket) => {
 app.use(express.json());
 app.use(express.static(path.join(process.env.ROOT, 'public')));
 app.use(cookieParser());
-app.use(helmet());
+app.use(helmet({
+    crossOriginResourcePolicy: { policy: "same-site" }, contentSecurityPolicy: {
+        directives: {
+            scriptSrc: ["'self'", "cdnjs.cloudflare.com", "cdnjs.cloudflare.com", "fonts.googleapis.com"],
+            defaultSrc: ["'self'", "cdnjs.cloudflare.com", "cdnjs.cloudflare.com", "fonts.googleapis.com"],
+        }
+    }
+}));
 app.use("/", viewsRouter);
 app.use("/api", apiRouter);
 server.listen(process.env.PORT, () => {
