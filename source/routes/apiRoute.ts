@@ -24,4 +24,8 @@ router.get("/get-invites-received", viewsController.authorization, apiController
 
 router.get("/get-chats", viewsController.authorization, apiController.getChats);
 
+router.get("/messages", viewsController.authorization, apiController.getMessages);
+
+router.post("/messages", viewsController.authorization, apiController.sendMessage);
+
 export default router;

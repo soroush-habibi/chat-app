@@ -1,7 +1,8 @@
 import 'dotenv/config';
 import express from 'express';
-import { Server, Socket } from 'socket.io';
+import { Server } from 'socket.io';
 import cookieParser from 'cookie-parser';
+import helmet from 'helmet';
 
 import http from 'http';
 import path from 'path';
@@ -31,6 +32,7 @@ io.on("connection", (socket) => {
 app.use(express.json());
 app.use(express.static(path.join(process.env.ROOT, 'public')));
 app.use(cookieParser());
+app.use(helmet());
 
 app.use("/", viewsRouter);
 app.use("/api", apiRouter);

@@ -252,4 +252,62 @@ export default class controller {
             message: "OK"
         });
     }
+    static sendMessage(req, res) {
+        DB.connect(async (client) => {
+            const result = await DB.sendMessage(res.locals.username, req.body.chatId, req.body.message).catch(e => {
+                res.status(400).json({
+                    success: false,
+                    body: null,
+                    message: e.message
+                });
+            });
+            if (result) {
+                res.status(200).json({
+                    success: true,
+                    body: null,
+                    message: "OK"
+                });
+            }
+            client.close();
+        }).catch(e => {
+            res.status(500).json({
+                success: false,
+                body: null,
+                message: e.message
+            });
+        });
+    }
+    static getMessages(req, res) {
+        if (!req.query.chatId) {
+            res.status(400).json({
+                success: false,
+                query: null,
+                message: "invalid input"
+            });
+            return;
+        }
+        DB.connect(async (client) => {
+            const result = await DB.getMessages(res.locals.username, req.query.chatId).catch(e => {
+                res.status(400).json({
+                    success: false,
+                    body: null,
+                    message: e.message
+                });
+            });
+            if (result) {
+                res.status(200).json({
+                    success: true,
+                    body: result,
+                    message: "OK"
+                });
+            }
+            client.close();
+        }).catch(e => {
+            res.status(500).json({
+                success: false,
+                body: null,
+                message: e.message
+            });
+        });
+    }
 }

@@ -167,4 +167,34 @@ export default class DB {
         const chats = await this.client.db("chatApp").collection("chats").find({ users: { $elemMatch: { username: username } } }).project({ _id: 0, messages: 0 }).toArray();
         return chats;
     }
+
+    static async sendMessage(username: string, chatId: string, message: string) {
+        if (!message || typeof message !== 'string'! || !chatId || typeof chatId !== 'string' || chatId.length !== 16) {
+            throw new Error("invalid input");
+        }
+
+        const result = await this.client.db("chatApp").collection("chats").updateOne({ chat_id: chatId, users: { $elemMatch: { username: username } } }, {
+            $push: {
+                messages: {
+                    sender: username,
+                    message: message
+                }
+            }
+        });
+
+        if (result.acknowledged && result.modifiedCount === 1) {
+            return true;
+        } else {
+            throw new Error("updating document failed");
+        }
+    }
+
+    static async getMessages(username: string, chatId: any): Promise<null | object[]> {
+        if (!chatId || typeof chatId !== 'string' || chatId.length !== 16) {
+            throw new Error("invalid input");
+        }
+
+        const messages = await this.client.db("chatApp").collection("chats").find({ chat_id: chatId, users: { $elemMatch: { username: username } } }).project({ _id: 0, messages: 1 }).toArray();
+        return messages;
+    }
 }

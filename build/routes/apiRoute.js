@@ -11,4 +11,6 @@ router.put("/accept-invite-pv", viewsController.authorization, apiController.acc
 router.delete("/decline-invite-pv/:chatId", viewsController.authorization, apiController.declineInvitePV);
 router.get("/get-invites-received", viewsController.authorization, apiController.getInvitesReceived);
 router.get("/get-chats", viewsController.authorization, apiController.getChats);
+router.get("/messages", viewsController.authorization, apiController.getMessages);
+router.post("/messages", viewsController.authorization, apiController.sendMessage);
 export default router;
