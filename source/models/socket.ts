@@ -30,7 +30,6 @@ export default class socketIo {
 
     static declineInvite() {
         this.socket.on("declineInvite", (chatId: string) => {
-            log("got it")
             this.socket.emit("declineInvite", chatId);
         });
     }

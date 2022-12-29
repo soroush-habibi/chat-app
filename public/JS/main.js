@@ -10,7 +10,6 @@ const notAuthBox = document.querySelector(".not-auth");
 const loggedInText = document.querySelector("#logged-in-text");
 
 const usernameInput = document.querySelector("#username-input");
-const emailInput = document.querySelector("#email-input");
 const passwordInput = document.querySelector("#password-input");
 const passwordInput2 = document.querySelector("#password2-input");
 
@@ -24,8 +23,7 @@ signUpButton.addEventListener('click', (e) => {
     formContainer.classList.remove('d-none');
     container.classList.add('d-none');
 
-    formContainer.querySelectorAll("label")[1].classList.remove("d-none");
-    formContainer.querySelectorAll("label")[3].classList.remove("d-none");
+    formContainer.querySelectorAll("label")[2].classList.remove("d-none");
 
     change.innerHTML = "You have account already? click here";
 
@@ -36,8 +34,7 @@ loginButton.addEventListener('click', (e) => {
     formContainer.classList.remove('d-none');
     container.classList.add('d-none');
 
-    formContainer.querySelectorAll("label")[1].classList.add("d-none");
-    formContainer.querySelectorAll("label")[3].classList.add("d-none");
+    formContainer.querySelectorAll("label")[2].classList.add("d-none");
 
     change.innerHTML = "You dont have acount? click here";
 
@@ -46,15 +43,13 @@ loginButton.addEventListener('click', (e) => {
 
 change.addEventListener('click', (e) => {
     if (pageStatus === 1) {
-        formContainer.querySelectorAll("label")[1].classList.remove("d-none");
-        formContainer.querySelectorAll("label")[3].classList.remove("d-none");
+        formContainer.querySelectorAll("label")[2].classList.remove("d-none");
 
         change.innerHTML = "You have account already? click here";
 
         pageStatus = 2;
     } else if (pageStatus === 2) {
-        formContainer.querySelectorAll("label")[1].classList.add("d-none");
-        formContainer.querySelectorAll("label")[3].classList.add("d-none");
+        formContainer.querySelectorAll("label")[2].classList.add("d-none");
 
         change.innerHTML = "You dont have acount? click here";
 
@@ -91,8 +86,6 @@ form.addEventListener('submit', async (e) => {
     } else if (pageStatus === 2) {
         if (usernameInput.value.length <= 5) {
             alert("username should be bigger than 5 character");
-        } else if (!(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/.test(emailInput.value))) {
-            alert("email is not valid");
         } else if (passwordInput.value.length < 8) {
             alert("password should be at least 8 character");
         } else if (passwordInput.value !== passwordInput2.value) {
@@ -108,8 +101,7 @@ form.addEventListener('submit', async (e) => {
                 submitButton.disabled = false;
 
                 if (data.success) {
-                    formContainer.querySelectorAll("label")[1].classList.add("d-none");
-                    formContainer.querySelectorAll("label")[3].classList.add("d-none");
+                    formContainer.querySelectorAll("label")[2].classList.add("d-none");
 
                     change.innerHTML = "You dont have acount? click here";
 

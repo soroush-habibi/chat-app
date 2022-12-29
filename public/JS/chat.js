@@ -90,6 +90,18 @@ document.addEventListener("DOMContentLoaded", (e) => {
             chatsDiv.appendChild(i);
         }
 
+        for (let i = 0; i < localStorage.length; i++) {
+            let check = false;
+            for (let j of chats) {
+                if (localStorage.key(i) == j.id) {
+                    check = true;
+                }
+            }
+            if (!check) {
+                localStorage.removeItem(localStorage.key(i));
+            }
+        }
+
         acceptBtn = document.querySelectorAll(".accept");
         declineBtn = document.querySelectorAll(".decline");
 
