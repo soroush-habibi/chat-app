@@ -11,6 +11,7 @@ socket.on("acceptInvite", (chatId) => {
         chat.classList.add("active");
         chat.innerHTML = chat.innerHTML.slice(0, chat.innerHTML.indexOf("(Pending Invite)"));
     }
+    addEventToChats();
 });
 
 socket.on("declineInvite", (chatId) => {
@@ -27,9 +28,13 @@ const inviteFormInput = document.getElementById("invite-form-input");
 const logOutBtn = document.getElementById("log-out");
 const invitesUl = document.getElementById("invites");
 const chatsDiv = document.getElementById("chats");
+const loadingText = document.getElementById("loading-text");
+const messagesDiv = document.querySelector(".chat-messages");
 let acceptBtn;
 let declineBtn;
 let currentUsername;
+let loading = false;
+let currentChat = null;
 
 let activeChat = null;
 
@@ -89,6 +94,8 @@ document.addEventListener("DOMContentLoaded", (e) => {
         for (let i of chats) {
             chatsDiv.appendChild(i);
         }
+
+        addEventToChats();
 
         for (let i = 0; i < localStorage.length; i++) {
             let check = false;
@@ -244,4 +251,50 @@ async function getChats(username) {
     }
 
     return result;
+}
+
+function addEventToChats() {
+    const chats = document.querySelectorAll(".active");
+
+    for (let i of chats) {
+        i.addEventListener('click', async (e) => {
+            if (!loading) {
+                const target = e.currentTarget;
+
+                i.classList.add("selected");
+
+                messagesDiv.classList.remove("start-up");
+                loadingText.classList.remove("d-none");
+
+                loading = true;
+                try {
+                    const response = await axios.get(`api/messages?chatId=${target.id}`);
+                    const data = await response.data;
+
+                    messagesDiv.innerHTML = "";
+                    for (let m of data.body[0].messages) {
+                        const message = document.createElement("div");
+                        message.classList.add("message")
+                        message.innerHTML = `<p class="meta">${m.sender} <span>${m.time}</span></p>
+                    <p class="text">
+                        ${m.message}
+                    </p>`
+                        messagesDiv.appendChild(message);
+                    }
+                    loadingText.classList.add("d-none");
+                    currentChat = target.id;
+                } catch (e) {
+                    currentChat = null;
+                    alert(e.response.data.message);
+                }
+                loading = false;
+
+                for (let j of chats) {
+                    if (target.id !== j.id) {
+                        j.classList.remove("selected");
+                    }
+                }
+            }
+        });
+    }
 }

@@ -98,6 +98,15 @@ a {
 
 .selected {
     background-color: rgba(255, 255, 255, 0.719);
+    color: #000000;
+}
+
+.start-up {
+    background-color: #777;
+}
+
+.d-none {
+    display: none;
 }
 
 .chat-sidebar h3 {

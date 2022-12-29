@@ -173,10 +173,17 @@ export default class DB {
             throw new Error("invalid input");
         }
 
+        const exists = await this.client.db("chatApp").collection("chats").findOne({ chat_id: chatId, users: { $elemMatch: { username: username } } });
+
+        if (!exists) {
+            throw new Error("chat doesn't exists");
+        }
+
         const result = await this.client.db("chatApp").collection("chats").updateOne({ chat_id: chatId, users: { $elemMatch: { username: username } } }, {
             $push: {
                 messages: {
                     sender: username,
+                    time: new Date(),
                     message: message
                 }
             }
@@ -192,6 +199,12 @@ export default class DB {
     static async getMessages(username: string, chatId: any): Promise<null | object[]> {
         if (!chatId || typeof chatId !== 'string' || chatId.length !== 16) {
             throw new Error("invalid input");
+        }
+
+        const exists = await this.client.db("chatApp").collection("chats").findOne({ chat_id: chatId, users: { $elemMatch: { username: username } } });
+
+        if (!exists) {
+            throw new Error("chat doesn't exists");
         }
 
         const messages = await this.client.db("chatApp").collection("chats").find({ chat_id: chatId, users: { $elemMatch: { username: username } } }).project({ _id: 0, messages: 1 }).toArray();
