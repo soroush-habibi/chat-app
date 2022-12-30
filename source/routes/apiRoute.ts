@@ -28,4 +28,6 @@ router.get("/messages", viewsController.authorization, apiController.getMessages
 
 router.post("/messages", viewsController.authorization, apiController.sendMessage);
 
+router.get("/messages/pub", viewsController.authorization, apiController.getPublicKey)
+
 export default router;

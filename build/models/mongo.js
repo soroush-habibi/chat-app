@@ -194,4 +194,24 @@ export default class DB {
         const messages = await this.client.db("chatApp").collection("chats").find({ chat_id: chatId, users: { $elemMatch: { username: username } } }).project({ _id: 0, messages: 1 }).toArray();
         return messages;
     }
+    static async getPublicKey(username, targetUser, chatId) {
+        if (!chatId || typeof chatId !== 'string' || chatId.length !== 16 || !targetUser || typeof targetUser !== 'string' || targetUser.length < 6 || username === targetUser) {
+            throw new Error("invalid input");
+        }
+        const exists = await this.client.db("chatApp").collection("chats").findOne({ chat_id: chatId, users: { $elemMatch: { username: username } } });
+        if (exists) {
+            const pubKey = exists.users.filter((value) => {
+                if (value.username === targetUser) {
+                    return true;
+                }
+            });
+            if (!pubKey.length) {
+                throw new Error("chat doesn't exists");
+            }
+            return pubKey[0].pkey;
+        }
+        else {
+            throw new Error("chat doesn't exists");
+        }
+    }
 }

@@ -306,4 +306,37 @@ export default class controller {
             });
         });
     }
+    static async getPublicKey(req, res) {
+        if (!req.query.targetUser || !req.query.chatId) {
+            res.status(400).json({
+                success: false,
+                query: null,
+                message: "invalid input"
+            });
+            return;
+        }
+        DB.connect(async (client) => {
+            const result = await DB.getPublicKey(res.locals.username, req.query.targetUser, req.query.chatId).catch(e => {
+                res.status(400).json({
+                    success: false,
+                    body: null,
+                    message: e.message
+                });
+            });
+            if (result) {
+                res.status(200).json({
+                    success: true,
+                    body: result,
+                    message: "OK"
+                });
+            }
+            client.close();
+        }).catch(e => {
+            res.status(500).json({
+                success: false,
+                body: null,
+                message: e.message
+            });
+        });
+    }
 }

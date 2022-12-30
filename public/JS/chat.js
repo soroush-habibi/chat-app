@@ -14,6 +14,7 @@ let declineBtn;
 let currentUsername;
 let loading = false;
 let currentChat = null;
+let currentKey = null;
 
 socket.on("invite", async (sender, chatId) => {
     addInvite(sender, chatId);
@@ -140,13 +141,11 @@ document.addEventListener("DOMContentLoaded", (e) => {
 
         addEventToChats();
 
+        //* garbage collector for local storage
         for (let i = 0; i < localStorage.length; i++) {
-            if (localStorage.key(i).length !== 16) {
-                continue;
-            }
             let check = false;
             for (let j of chats) {
-                if (localStorage.key(i) == j.id) {
+                if (localStorage.key(i).startsWith(j.id)) {
                     check = true;
                 }
             }
@@ -322,13 +321,15 @@ function addEventToChats() {
 
                 loading = true;
                 try {
-                    const response = await axios.get(`api/messages?chatId=${target.id}`);
+                    const response = await axios.get(`api/messages?chatId=${encodeURIComponent(target.id)}`);
                     const data = await response.data;
+
+                    const response2 = await axios.get(`api/messages/pub?targetUser=${target.innerHTML}&chatId=${target.id}`);
+                    const data2 = await response2.data;
 
                     messagesDiv.innerHTML = "";
                     for (let i = 0; i < data.body[0].messages.length; i++) {
                         const m = data.body[0].messages[i];
-                        console.log(m);
                         const message = document.createElement("div");
                         message.classList.add("message");
                         if (localStorage.getItem(`${target.id}?${m.index}`)) {
@@ -346,6 +347,7 @@ function addEventToChats() {
                     loadingText.classList.add("d-none");
                     messagesDiv.classList.remove("d-none");
                     currentChat = target.id;
+                    currentKey = data2.body;
                 } catch (e) {
                     currentChat = null;
                     alert(e.response.data.message);
