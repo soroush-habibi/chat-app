@@ -3,34 +3,35 @@ import { Socket } from 'socket.io';
 const log = console.log;
 
 export default class socketIo {
-    private static socket: Socket;
-    static register(socket: Socket) {
-        this.socket = socket;
-    }
+    constructor(private socket: Socket) { }
 
-    static joinEvent() {
+    joinEvent() {
         this.socket.on("join", (rooms: string[]) => {
             this.socket.join(rooms);
         });
     }
 
-    static joinManual(rooms: string[]) {
-        this.socket.join(rooms);
-    }
-
-    static sendInvite(username: string, targetUser: string, chatId: string) {
-        this.socket.to(targetUser).emit("invite", username, chatId);
-    }
-
-    static acceptInvite() {
-        this.socket.on("acceptInvite", (chatId: string) => {
-            this.socket.emit("acceptInvite", chatId);
+    sendInvite() {
+        this.socket.on("invite", (username: string, targetUser: string, chatId: string) => {
+            this.socket.to(targetUser).emit("invite", username, chatId);
         });
     }
 
-    static declineInvite() {
+    acceptInvite() {
+        this.socket.on("acceptInvite", (chatId: string) => {
+            this.socket.to(chatId).emit("accept", chatId);
+        });
+    }
+
+    declineInvite() {
         this.socket.on("declineInvite", (chatId: string) => {
-            this.socket.emit("declineInvite", chatId);
+            this.socket.to(chatId).emit("decline", chatId);
+        });
+    }
+
+    sendMessage() {
+        this.socket.on("sendMessage", (chatId, message) => {
+            this.socket.to(chatId).emit("send", chatId, message);
         });
     }
 }

@@ -1,26 +1,5 @@
 const socket = io();
 
-socket.on("invite", async (sender, chatId) => {
-    addInvite(sender, chatId);
-});
-
-socket.on("acceptInvite", (chatId) => {
-    const chat = document.querySelector("#chats").querySelector(`#${chatId}`);
-    if (chat) {
-        chat.classList.remove("pending");
-        chat.classList.add("active");
-        chat.innerHTML = chat.innerHTML.slice(0, chat.innerHTML.indexOf("(Pending Invite)"));
-    }
-    addEventToChats();
-});
-
-socket.on("declineInvite", (chatId) => {
-    const chat = document.querySelector("#chats").querySelector(`#${chatId}`);
-    if (chat) {
-        chat.remove();
-    }
-});
-
 const chatForm = document.getElementById("chat-form");
 const inviteForm = document.getElementById("invite-form");
 const inviteFormInput = document.getElementById("invite-form-input");
@@ -38,6 +17,40 @@ let currentChat = null;
 
 let activeChat = null;
 
+socket.on("invite", async (sender, chatId) => {
+    addInvite(sender, chatId);
+});
+
+socket.on("accept", (chatId) => {
+    const chat = document.querySelector("#chats").querySelector(`#${chatId}`);
+    if (chat) {
+        chat.classList.remove("pending");
+        chat.classList.add("active");
+        chat.innerHTML = chat.innerHTML.slice(0, chat.innerHTML.indexOf("(Pending Invite)"));
+        addEventToChats();
+        socket.emit("join", [chatId]);
+    }
+});
+
+socket.on("decline", (chatId) => {
+    const chat = document.querySelector("#chats").querySelector(`#${chatId}`);
+    if (chat) {
+        chat.remove();
+    }
+});
+
+socket.on("send", (chatId, data) => {
+    if (currentChat == chatId) {
+        const message = document.createElement("div");
+        message.classList.add("message");
+        message.innerHTML = `<p class="meta">${data.sender} <span>${data.time}</span></p>
+    <p class="text">
+        ${data.message}
+    </p>`
+        messagesDiv.appendChild(message);
+    }
+});
+
 chatForm.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -50,12 +63,13 @@ chatForm.addEventListener('submit', async (e) => {
             const data = await response.data;
 
             const message = document.createElement("div");
-            message.classList.add("message")
+            message.classList.add("message");
             message.innerHTML = `<p class="meta">${data.body.sender} <span>${data.body.time}</span></p>
     <p class="text">
         ${data.body.message}
     </p>`
             messagesDiv.appendChild(message);
+            socket.emit("sendMessage", currentChat, data.body);
         } catch (e) {
             alert(e.response.data.message);
         }
@@ -73,9 +87,10 @@ inviteForm.addEventListener('submit', async (e) => {
         if (!data.success) {
             alert(data.message);
         } else {
-            localStorage.setItem(data.body.chat_id, data.body.privateKey);
+            localStorage.setItem(data.body.chat_id, JSON.stringify({ privateKey: data.body.privateKey, publicKey: data.body.publicKey }));
             addChat(username, data.body.chat_id, true);
             socket.emit("join", [data.body.chat_id]);
+            socket.emit("invite", currentUsername, username, data.body.chat_id);
         }
     } catch (e) {
         alert(e.response.data.message);
@@ -141,11 +156,12 @@ document.addEventListener("DOMContentLoaded", (e) => {
                 if (!data.success) {
                     console.log(data.message);
                 } else {
-                    localStorage.setItem(data.body.chat_id, data.body.privateKey);
+                    localStorage.setItem(data.body.chat_id, JSON.stringify({ privateKey: data.body.privateKey, publicKey: data.body.publicKey }));
                     removeInvite(target.parentNode.parentNode.id);
                     addChat(target.parentNode.parentNode.innerHTML.split("<div>")[0], target.parentNode.parentNode.id, false);
                     socket.emit("join", [target.parentNode.parentNode.id]);
                     socket.emit("acceptInvite", target.parentNode.parentNode.id)
+                    addEventToChats();
                 }
             });
         }
@@ -176,6 +192,7 @@ function addInvite(username, chatId) {
 </div>`;
     invitesUl.appendChild(li);
 
+    console.log(chatId);
     invitesUl.querySelector(`#${chatId}`).querySelector(".accept").addEventListener('click', async (e) => {
         const target = e.currentTarget;
         const response = await axios.put("api/accept-invite-pv", { chatId: target.parentNode.parentNode.id });
@@ -183,11 +200,12 @@ function addInvite(username, chatId) {
         if (!data.success) {
             console.log(data.message);
         } else {
-            localStorage.setItem(data.body.chat_id, data.body.privateKey);
+            localStorage.setItem(data.body.chat_id, JSON.stringify({ privateKey: data.body.privateKey, publicKey: data.body.publicKey }));
             removeInvite(target.parentNode.parentNode.id);
             addChat(target.parentNode.parentNode.innerHTML.split("<div>")[0], target.parentNode.parentNode.id, false);
             socket.emit("join", [target.parentNode.parentNode.id]);
             socket.emit("acceptInvite", target.parentNode.parentNode.id);
+            addEventToChats();
         }
     });
 
@@ -284,8 +302,14 @@ function addEventToChats() {
 
                 i.classList.add("selected");
 
-                messagesDiv.classList.remove("start-up");
+                messagesDiv.classList.add("d-none");
                 loadingText.classList.remove("d-none");
+
+                for (let j of chats) {
+                    if (target.id !== j.id) {
+                        j.classList.remove("selected");
+                    }
+                }
 
                 loading = true;
                 try {
@@ -295,26 +319,21 @@ function addEventToChats() {
                     messagesDiv.innerHTML = "";
                     for (let m of data.body[0].messages) {
                         const message = document.createElement("div");
-                        message.classList.add("message")
+                        message.classList.add("message");
                         message.innerHTML = `<p class="meta">${m.sender} <span>${m.time}</span></p>
                     <p class="text">
                         ${m.message}
-                    </p>`
+                    </p>`;
                         messagesDiv.appendChild(message);
                     }
                     loadingText.classList.add("d-none");
+                    messagesDiv.classList.remove("d-none");
                     currentChat = target.id;
                 } catch (e) {
                     currentChat = null;
                     alert(e.response.data.message);
                 }
                 loading = false;
-
-                for (let j of chats) {
-                    if (target.id !== j.id) {
-                        j.classList.remove("selected");
-                    }
-                }
             }
         });
     }

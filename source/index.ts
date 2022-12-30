@@ -23,23 +23,19 @@ const io = new Server(server);
 
 io.on("connection", (socket) => {
     log("someone connect to PV with id " + socket.id);
-    socketModule.register(socket);
-    socketModule.joinEvent();
-    socketModule.acceptInvite();
-    socketModule.declineInvite();
+    const socketObject = new socketModule(socket);
+    socketObject.joinEvent();
+    socketObject.sendInvite();
+    socketObject.acceptInvite();
+    socketObject.declineInvite();
+    socketObject.sendMessage();
 });
 
 app.use(express.json());
 app.use(express.static(path.join(process.env.ROOT, 'public')));
 app.use(cookieParser());
-app.use(helmet({
-    crossOriginResourcePolicy: { policy: "same-site" }, contentSecurityPolicy: {
-        directives: {
-            scriptSrc: ["'self'", "cdnjs.cloudflare.com", "cdnjs.cloudflare.com", "fonts.googleapis.com"],
-            defaultSrc: ["'self'", "cdnjs.cloudflare.com", "cdnjs.cloudflare.com", "fonts.googleapis.com"],
-        }
-    }
-}));
+app.use(helmet.xssFilter());
+app.use(helmet.hidePoweredBy());
 
 app.use("/", viewsRouter);
 app.use("/api", apiRouter);

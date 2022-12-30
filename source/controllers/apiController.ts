@@ -6,7 +6,6 @@ import path from 'path';
 import crypto from 'crypto';
 
 import DB from "../models/mongo.js";
-import socketModule from '../models/socket.js';
 
 const log = console.log;
 
@@ -127,11 +126,10 @@ export default class controller {
             });
 
             if (chatId) {
-                socketModule.joinManual([chatId]);
-                socketModule.sendInvite(res.locals.username, req.body.targetUser, chatId);
+                // socketModule.sendInvite(res.locals.username, req.body.targetUser, chatId);
                 res.status(200).json({
                     success: true,
-                    body: { chat_id: chatId, privateKey },
+                    body: { chat_id: chatId, privateKey, publicKey },
                     message: "OK"
                 });
             }
@@ -169,10 +167,9 @@ export default class controller {
             });
 
             if (result) {
-                socketModule.joinManual([req.body.chatId]);
                 res.status(200).json({
                     success: true,
-                    body: { chat_id: req.body.chatId, privateKey },
+                    body: { chat_id: req.body.chatId, privateKey, publicKey },
                     message: "OK"
                 });
             }
