@@ -31,6 +31,7 @@ app.use(express.static(path.join(process.env.ROOT, 'public')));
 app.use(cookieParser());
 app.use(helmet.xssFilter());
 app.use(helmet.hidePoweredBy());
+app.use(helmet.noSniff());
 app.use("/", viewsRouter);
 app.use("/api", apiRouter);
 server.listen(process.env.PORT, () => {

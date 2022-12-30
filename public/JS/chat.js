@@ -15,8 +15,6 @@ let currentUsername;
 let loading = false;
 let currentChat = null;
 
-let activeChat = null;
-
 socket.on("invite", async (sender, chatId) => {
     addInvite(sender, chatId);
 });
@@ -46,7 +44,10 @@ socket.on("send", (chatId, data) => {
         message.innerHTML = `<p class="meta">${data.sender} <span>${data.time}</span></p>
     <p class="text">
         ${data.message}
-    </p>`
+    </p>`;
+        if (data.sender === currentUsername) {
+            message.style.backgroundColor = "#89FF8F";
+        }
         messagesDiv.appendChild(message);
     }
 });
@@ -59,7 +60,8 @@ chatForm.addEventListener('submit', async (e) => {
     } else {
         loading = true;
         try {
-            const response = await axios.post("api/messages", { chatId: currentChat, message: chatInput.value });
+            const inputValue = chatInput.value;
+            const response = await axios.post("api/messages", { chatId: currentChat, message: inputValue });
             const data = await response.data;
 
             const message = document.createElement("div");
@@ -67,9 +69,14 @@ chatForm.addEventListener('submit', async (e) => {
             message.innerHTML = `<p class="meta">${data.body.sender} <span>${data.body.time}</span></p>
     <p class="text">
         ${data.body.message}
-    </p>`
+    </p>`;
+            if (data.body.sender === currentUsername) {
+                message.style.backgroundColor = "#89FF8F";
+            }
             messagesDiv.appendChild(message);
             socket.emit("sendMessage", currentChat, data.body);
+            chatInput.value = "";
+            localStorage.setItem(`${currentChat}?${data.body.index}`, inputValue);
         } catch (e) {
             alert(e.response.data.message);
         }
@@ -134,6 +141,9 @@ document.addEventListener("DOMContentLoaded", (e) => {
         addEventToChats();
 
         for (let i = 0; i < localStorage.length; i++) {
+            if (localStorage.key(i).length !== 16) {
+                continue;
+            }
             let check = false;
             for (let j of chats) {
                 if (localStorage.key(i) == j.id) {
@@ -192,7 +202,6 @@ function addInvite(username, chatId) {
 </div>`;
     invitesUl.appendChild(li);
 
-    console.log(chatId);
     invitesUl.querySelector(`#${chatId}`).querySelector(".accept").addEventListener('click', async (e) => {
         const target = e.currentTarget;
         const response = await axios.put("api/accept-invite-pv", { chatId: target.parentNode.parentNode.id });
@@ -317,13 +326,21 @@ function addEventToChats() {
                     const data = await response.data;
 
                     messagesDiv.innerHTML = "";
-                    for (let m of data.body[0].messages) {
+                    for (let i = 0; i < data.body[0].messages.length; i++) {
+                        const m = data.body[0].messages[i];
+                        console.log(m);
                         const message = document.createElement("div");
                         message.classList.add("message");
+                        if (localStorage.getItem(`${target.id}?${m.index}`)) {
+                            m.message = localStorage.getItem(`${target.id}?${m.index}`);
+                        }
                         message.innerHTML = `<p class="meta">${m.sender} <span>${m.time}</span></p>
                     <p class="text">
                         ${m.message}
                     </p>`;
+                        if (m.sender === currentUsername) {
+                            message.style.backgroundColor = "#89FF8F";
+                        }
                         messagesDiv.appendChild(message);
                     }
                     loadingText.classList.add("d-none");

@@ -126,7 +126,6 @@ export default class controller {
             });
 
             if (chatId) {
-                // socketModule.sendInvite(res.locals.username, req.body.targetUser, chatId);
                 res.status(200).json({
                     success: true,
                     body: { chat_id: chatId, privateKey, publicKey },

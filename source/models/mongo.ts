@@ -179,13 +179,16 @@ export default class DB {
             throw new Error("chat doesn't exists");
         }
 
+        const index: number = exists.messages.length;
+
         const time = new Date();
         const result = await this.client.db("chatApp").collection("chats").updateOne({ chat_id: chatId, users: { $elemMatch: { username: username } } }, {
             $push: {
                 messages: {
                     sender: username,
                     time: time,
-                    message: message
+                    message: message,
+                    index: index
                 }
             }
         });
@@ -194,7 +197,8 @@ export default class DB {
             return {
                 sender: username,
                 time: time,
-                message: message
+                message: message,
+                index: index
             };
         } else {
             throw new Error("updating document failed");
