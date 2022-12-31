@@ -92,16 +92,14 @@ export default class controller {
     }
     static invitePV(req, res) {
         const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-            modulusLength: 4096,
+            modulusLength: 2048,
             publicKeyEncoding: {
                 type: 'spki',
                 format: 'pem',
             },
             privateKeyEncoding: {
-                type: 'pkcs8',
+                type: 'pkcs1',
                 format: 'pem',
-                cipher: 'aes-256-cbc',
-                passphrase: 'top secret',
             }
         });
         DB.connect(async (client) => {
@@ -130,16 +128,14 @@ export default class controller {
     }
     static acceptInvitePV(req, res) {
         const { publicKey, privateKey } = crypto.generateKeyPairSync('rsa', {
-            modulusLength: 4096,
+            modulusLength: 2048,
             publicKeyEncoding: {
                 type: 'spki',
                 format: 'pem',
             },
             privateKeyEncoding: {
-                type: 'pkcs8',
+                type: 'pkcs1',
                 format: 'pem',
-                cipher: 'aes-256-cbc',
-                passphrase: 'top secret',
             }
         });
         DB.connect(async (client) => {
@@ -326,7 +322,7 @@ export default class controller {
             if (result) {
                 res.status(200).json({
                     success: true,
-                    body: result,
+                    body: result.replace(/\n/g, ''),
                     message: "OK"
                 });
             }

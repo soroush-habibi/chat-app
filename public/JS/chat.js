@@ -42,6 +42,9 @@ socket.on("send", (chatId, data) => {
     if (currentChat == chatId) {
         const message = document.createElement("div");
         message.classList.add("message");
+        const decrypt = new JSEncrypt();
+        decrypt.setPrivateKey(JSON.parse(localStorage.getItem(chatId)).privateKey.replace(/\n/g, ''));
+        data.message = decrypt.decrypt(data.message);
         message.innerHTML = `<p class="meta">${data.sender} <span>${data.time}</span></p>
     <p class="text">
         ${data.message}
@@ -62,14 +65,16 @@ chatForm.addEventListener('submit', async (e) => {
         loading = true;
         try {
             const inputValue = chatInput.value;
-            const response = await axios.post("api/messages", { chatId: currentChat, message: inputValue });
+            const encrypt = new JSEncrypt();
+            encrypt.setPublicKey(currentKey);
+            const response = await axios.post("api/messages", { chatId: currentChat, message: encrypt.encrypt(inputValue) });
             const data = await response.data;
 
             const message = document.createElement("div");
             message.classList.add("message");
             message.innerHTML = `<p class="meta">${data.body.sender} <span>${data.body.time}</span></p>
     <p class="text">
-        ${data.body.message}
+        ${inputValue}
     </p>`;
             if (data.body.sender === currentUsername) {
                 message.style.backgroundColor = "#89FF8F";
@@ -334,6 +339,10 @@ function addEventToChats() {
                         message.classList.add("message");
                         if (localStorage.getItem(`${target.id}?${m.index}`)) {
                             m.message = localStorage.getItem(`${target.id}?${m.index}`);
+                        } else {
+                            const decrypt = new JSEncrypt();
+                            decrypt.setPrivateKey(JSON.parse(localStorage.getItem(target.id)).privateKey.replace(/\n/g, ''));
+                            m.message = decrypt.decrypt(m.message);
                         }
                         message.innerHTML = `<p class="meta">${m.sender} <span>${m.time}</span></p>
                     <p class="text">
