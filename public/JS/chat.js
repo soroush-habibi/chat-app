@@ -4,6 +4,7 @@ const chatForm = document.getElementById("chat-form");
 const inviteForm = document.getElementById("invite-form");
 const inviteFormInput = document.getElementById("invite-form-input");
 const logOutBtn = document.getElementById("log-out");
+const chatFormSubmitBtn = document.getElementById("send-button");
 const invitesUl = document.getElementById("invites");
 const chatsDiv = document.getElementById("chats");
 const loadingText = document.getElementById("loading-text");
@@ -53,6 +54,7 @@ socket.on("send", (chatId, data) => {
             message.style.backgroundColor = "#89FF8F";
         }
         messagesDiv.appendChild(message);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
     }
 });
 
@@ -63,6 +65,7 @@ chatForm.addEventListener('submit', async (e) => {
         alert("You must open a chat");
     } else {
         loading = true;
+        chatFormSubmitBtn.classList.add("d-none");
         try {
             const inputValue = chatInput.value;
             const encrypt = new JSEncrypt();
@@ -80,6 +83,7 @@ chatForm.addEventListener('submit', async (e) => {
                 message.style.backgroundColor = "#89FF8F";
             }
             messagesDiv.appendChild(message);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
             socket.emit("sendMessage", currentChat, data.body);
             chatInput.value = "";
             localStorage.setItem(`${currentChat}?${data.body.index}`, inputValue);
@@ -87,6 +91,7 @@ chatForm.addEventListener('submit', async (e) => {
             alert(e.response.data.message);
         }
         loading = false;
+        chatFormSubmitBtn.classList.remove("d-none");
     }
 });
 
@@ -357,6 +362,7 @@ function addEventToChats() {
                     messagesDiv.classList.remove("d-none");
                     currentChat = target.id;
                     currentKey = data2.body;
+                    messagesDiv.scrollTop = messagesDiv.scrollHeight;
                 } catch (e) {
                     currentChat = null;
                     alert(e.response.data.message);
