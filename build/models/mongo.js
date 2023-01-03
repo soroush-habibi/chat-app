@@ -1,5 +1,7 @@
 import mongodb from 'mongodb';
 import bcrypt from 'bcrypt';
+import fs from 'fs';
+import path from 'path';
 import generate from './generate.js';
 const log = console.log;
 export default class DB {
@@ -118,6 +120,9 @@ export default class DB {
                 }
             });
             if (result.acknowledged && result.modifiedCount === 1) {
+                if (process.env.ROOT) {
+                    fs.mkdirSync(path.join(process.env.ROOT, "/uploads", chatId));
+                }
                 return true;
             }
             else {
@@ -167,6 +172,7 @@ export default class DB {
                     sender: username,
                     time: time,
                     message: message,
+                    file: false,
                     index: index
                 }
             }
@@ -176,6 +182,42 @@ export default class DB {
                 sender: username,
                 time: time,
                 message: message,
+                file: false,
+                index: index
+            };
+        }
+        else {
+            throw new Error("updating document failed");
+        }
+    }
+    static async sendFile(username, chatId, realFilename, savedFilename, size) {
+        if (!realFilename || typeof realFilename !== 'string' || !chatId || typeof chatId !== 'string' || chatId.length !== 16 || !savedFilename
+            || typeof savedFilename !== 'string' || !size || typeof size !== 'number') {
+            throw new Error("invalid input");
+        }
+        const exists = await this.client.db("chatApp").collection("chats").findOne({ chat_id: chatId, users: { $elemMatch: { username: username } } });
+        if (!exists) {
+            throw new Error("chat doesn't exists");
+        }
+        const index = exists.messages.length;
+        const time = new Date();
+        const result = await this.client.db("chatApp").collection("chats").updateOne({ chat_id: chatId, users: { $elemMatch: { username: username } } }, {
+            $push: {
+                messages: {
+                    sender: username,
+                    time: time,
+                    message: JSON.stringify({ realFilename, savedFilename }),
+                    file: true,
+                    index: index
+                }
+            }
+        });
+        if (result.acknowledged && result.modifiedCount === 1) {
+            return {
+                sender: username,
+                time: time,
+                message: { realFilename, savedFilename },
+                file: true,
                 index: index
             };
         }

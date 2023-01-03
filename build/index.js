@@ -27,6 +27,7 @@ io.on("connection", (socket) => {
     socketObject.sendMessage();
 });
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 app.use(express.static(path.join(process.env.ROOT, 'public')));
 app.use(cookieParser());
 app.use(helmet.xssFilter());

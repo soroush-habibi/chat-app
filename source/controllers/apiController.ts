@@ -1,11 +1,13 @@
 import express from 'express';
 import JWT from 'jsonwebtoken';
+import formidable from 'formidable';
 
 import fs from 'fs';
 import path from 'path';
 import crypto from 'crypto';
 
 import DB from "../models/mongo.js";
+import generate from '../models/generate.js';
 
 const log = console.log;
 
@@ -272,31 +274,106 @@ export default class controller {
     }
 
     static sendMessage(req: express.Request, res: express.Response) {
-        DB.connect(async (client) => {
-            const result = await DB.sendMessage(res.locals.username, req.body.chatId, req.body.message).catch(e => {
-                res.status(400).json({
+        if (req.body.chatId) {
+            DB.connect(async (client) => {
+                const result = await DB.sendMessage(res.locals.username, req.body.chatId, req.body.message).catch(e => {
+                    res.status(400).json({
+                        success: false,
+                        body: null,
+                        message: e.message
+                    });
+                });
+
+                if (result) {
+                    res.status(200).json({
+                        success: true,
+                        body: result,
+                        message: "OK"
+                    });
+                }
+
+                client.close();
+            }).catch(e => {
+                res.status(500).json({
                     success: false,
                     body: null,
                     message: e.message
                 });
             });
+        } else {
+            try {
+                const form = formidable({
+                    allowEmptyFiles: false,
+                    keepExtensions: true,
+                    multiples: false,
+                    maxFileSize: 1000 * 1024 * 1024
+                });
 
-            if (result) {
-                res.status(200).json({
-                    success: true,
-                    body: result,
-                    message: "OK"
+                form.parse(req, async (err, fields, files: any) => {
+                    if (err) {
+                        throw new Error("fail to parse file")
+                    } else {
+                        const realFilename = files[''].originalFilename;
+                        const filepath: any = files[''].filepath;
+                        let ext: string | string[] = filepath.split(".");
+                        ext = ext[ext.length - 1];
+                        let savedFilename: string;
+                        if (process.env.ROOT) {
+                            do {
+                                savedFilename = generate.filename(ext);
+                            } while (fs.existsSync(path.join(process.env.ROOT, "/uploads", fields.chatId as string, savedFilename)));
+
+                            DB.connect(async (client) => {
+
+                                const result = await DB.sendFile(res.locals.username, fields.chatId as string, realFilename, savedFilename, files[''].size).catch(e => {
+                                    res.status(400).json({
+                                        success: false,
+                                        body: null,
+                                        message: e.message
+                                    });
+                                });
+
+                                if (result) {
+                                    if (process.env.ROOT) {
+                                        fs.copyFileSync(filepath, path.join(process.env.ROOT, "/uploads", fields.chatId as string, savedFilename));
+                                    } else {
+                                        res.status(500).json({
+                                            success: false,
+                                            body: null,
+                                            message: "ROOT does not exist in environment variables"
+                                        });
+                                    }
+                                    res.status(200).json({
+                                        success: true,
+                                        body: result,
+                                        message: "OK"
+                                    });
+                                }
+                                client.close();
+                            }).catch(e => {
+                                res.status(500).json({
+                                    success: false,
+                                    body: null,
+                                    message: e.message
+                                });
+                            });
+                        } else {
+                            res.status(500).json({
+                                success: false,
+                                body: null,
+                                message: "ROOT does not exist in environment variables"
+                            });
+                        }
+                    }
+                });
+            } catch (e: any) {
+                res.status(500).json({
+                    success: false,
+                    body: null,
+                    message: e.message
                 });
             }
-
-            client.close();
-        }).catch(e => {
-            res.status(500).json({
-                success: false,
-                body: null,
-                message: e.message
-            });
-        });
+        }
     }
 
     static getMessages(req: express.Request, res: express.Response) {
@@ -335,7 +412,7 @@ export default class controller {
         });
     }
 
-    static async getPublicKey(req: express.Request, res: express.Response) {
+    static getPublicKey(req: express.Request, res: express.Response) {
         if (!req.query.targetUser || !req.query.chatId) {
             res.status(400).json({
                 success: false,
