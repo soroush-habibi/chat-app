@@ -1,35 +1,228 @@
-body {
-    background-color: bisque;
+@font-face {
+    font-family: 'Bangers';
+    src: url('../fonts/Bangers.woff2') format('woff2'),
+        url('../fonts/Bangers.woff') format('woff'),
+        url('../fonts/Bangers.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
 }
 
-.container {
+@font-face {
+    font-family: 'BerkshireSwash-Regular';
+    src: url('../fonts/BerkshireSwash-Regular.woff2') format('woff2'),
+        url('../fonts/BerkshireSwash-Regular.woff') format('woff'),
+        url('../fonts/BerkshireSwash-Regular.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'Cookie-Regular';
+    src: url('../fonts/Cookie-Regular.woff2') format('woff2'),
+        url('../fonts/Cookie-Regular.woff') format('woff'),
+        url('../fonts/Cookie-Regular.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'LuckiestGuy';
+    src: url('../fonts/LuckiestGuy.woff2') format('woff2'),
+        url('../fonts/LuckiestGuy.woff') format('woff'),
+        url('../fonts/LuckiestGuy.ttf') format('ttf');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    padding: 0px;
+    margin: 0px;
+}
+
+header {
+    background-color: rgb(111, 186, 196);
+    height: 70px;
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+}
+
+header div.hdr1 {
+    width: 80%;
+    display: flex;
+    flex-direction: row;
+}
+
+header div.hdr1 div.webtitle {
+    margin-left: 20px;
+    margin-top: 11px;
+}
+
+header div.hdr1 div.webtitle h1 {
+
+    font-size: xx-large;
+    font-family: 'BerkshireSwash-Regular';
+    font-style: normal;
+
+}
+
+header div.hdr1 div.webtitle h1 a {
+    text-decoration: none;
+    color: azure;
+}
+
+header div.hdr1 div.webtitle h1 a:hover {
+    cursor: pointer;
+}
+
+header div.hdr1 div.logo img {
+    width: 56px;
+    height: 50px;
+    line-height: 60px;
+    margin: 8px 0px 0px 10px;
+}
+
+header div.hdr2 {
+    flex-direction: row;
+    width: 30%;
+    height: 50px;
+    padding-top: 18px;
+    float: right;
+}
+
+header div.hdr2 div.usr {
+    display: flex;
+    flex-direction: row;
+}
+
+header div.hdr2 div.usr div.regtxt h2 a {
+    font-family: 'Bangers';
+    text-decoration: none;
+    color: azure;
+}
+
+header div.hdr2 div.usr div.logtxt h2 a {
+    text-decoration: none;
+    color: azure;
+    margin-left: 8px;
+}
+
+header div.hdr0 {
+    width: 0%;
+    height: 70px;
+}
+
+.section1 {
+    display: flex;
+    flex-direction: row;
+}
+
+.section1 .pic {
+    height: 100%;
+    width: 55%;
+    margin: 0;
+}
+
+.section1 .pic img {
+    height: 800px;
+    width: 770px;
+}
+
+.section1 .logreg {
+    height: 800px;
+    width: 55%;
+    margin: 0;
+}
+
+/*start form style*/
+
+.section1 .logreg .auth .container {
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 800px;
+    background-image: radial-gradient(rgb(255, 246, 230), rgb(127, 225, 255));
 }
 
-button {
-    font-size: 50px;
-    color: aliceblue;
-    padding: 20px;
-    margin: 20px;
+.section1 .logreg .auth .container .logbox {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: rgb(127, 225, 255);
     border-radius: 15px;
+    height: 300px;
+    width: 250px;
+}
+
+.section1 .logreg .auth .container .logbox h2 {
+    margin-top: 20px;
+}
+
+.section1 .logreg .auth .container .logbox button {
+    font-size: 25px;
+    color: rgb(1, 30, 54);
+    padding: 7px 20px 7px 20px;
+    margin: 30px 25px 10px 30px;
+    border: 1px solid rgb(0, 0, 0);
+    border-radius: 10px;
+    background-color: rgb(255, 236, 236);
+}
+
+.section1 .logreg .auth .container .logbox button:hover {
+    background: rgb(61, 139, 255);
+    cursor: pointer;
+}
+
+.section1 .logreg .auth .form-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 800px;
+    /*background:rgb(255, 246, 230);*/
+    background-image: radial-gradient(rgb(255, 246, 230), rgb(127, 225, 255));
+}
+
+.section1 .logreg .auth .form-container button {
+    font-size: 20px;
+    color: aliceblue;
+    padding: 7px 20px 7px 20px;
+    margin: 30px 25px 10px 10px;
+    border-radius: 20px;
     background-color: rgba(112, 152, 211, 0.815);
 }
 
-.form-container {
+.section1 .logreg .auth .form-container form {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-}
-
-input {
-    width: max-content;
-}
-
-form {
     width: 200px;
+    /*border: 2px solid rgb(0, 26, 143);*/
+    border-radius: 15px;
+    background-color: rgb(127, 225, 255);
+    padding: 55px 20px 40px 45px;
+    margin: 0px 0px 20px 0px;
+    font-family: 'Bangers';
+    font-size: 18px;
+}
+
+.section1 .logreg .auth .form-container form input {
+    width: max-content;
+    height: 20px;
+}
+
+#username-input {
+    margin: 0px 0px 10px 0px;
+}
+
+#password-input {
+    margin: 0px 0px 10px 0px;
+}
+
+#password2-input {
+    margin: 0px 0px 10px 0px;
 }
 
 #change:hover {
@@ -37,13 +230,13 @@ form {
     color: red;
 }
 
-.d-none {
+.section1 .logreg .auth .d-none {
     display: none;
 }
 
-#submit {
-    font-size: 25px;
-    padding: 7px;
-    margin: 5px;
-    margin-left: 45px;
+#submit:hover {
+    background: rgb(61, 139, 255);
+    cursor: pointer;
 }
+
+/*End form style*/

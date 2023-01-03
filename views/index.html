@@ -1,39 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Index Page</title>
-    <link rel="stylesheet" href="CSS/main.css">
+    <meta charset="utf-8">
+    <title>WebChat</title>
+    <link rel="icon" href="img/message.png" type="image/png">
+    <link rel="stylesheet" href="CSS/main.css" type="text/css">
 </head>
 
 <body>
-    <div class="container not-auth d-none">
-        <button type="button" id="loginButton">Login</button>
-        <button type="button" id="signUpButton">Sign up</button>
-    </div>
 
-    <div class="form-container d-none">
-        <form action="">
-            <label for="">Username
-                <input type="text" id="username-input" />
-            </label>
+    <!--Start Header-->
 
-            <label for="">Password
-                <input type="password" id="password-input" />
-            </label>
+    <header>
+        <div class="hdr1">
+            <div class="logo">
+                <img src="img/message.png" alt="web-logo">
+            </div>
+            <div class="webtitle">
+                <h1>WebChat Application</h1>
+            </div>
+        </div>
+        <div class="hdr0">
 
-            <label for="">Repeat Password
-                <input type="password" id="password2-input" />
-            </label>
-            <button type="submit" id="submit">submit</button>
-        </form>
-        <h4 id="change">Create Account/You have account?</h4>
-    </div>
+        </div><!--
+            <div class="hdr2">
+                <div class="usr">
+                    <div class="regtxt">
+                        <h2><a href="#">Register </a></h2>
+                    </div>
+                    <div class="reglogo">
+                        <img src="all/img/signup.png" type="image/png" alt="Reg-logo" width="30px">
+                    </div>
+                    <div class="logtxt">
+                        <h2><a href="#">|  Login </a></h2>
+                    </div>
+                    <div class="loglogo">
+                        <img src="all/img/login.png" type="image/png" alt="log-logo" width="30px">
+                    </div>
+                </div>
+            </div> -->
+    </header>
+
+    <!--End Header-->
+
+    <!--Start Section1-->
+
+    <section class="section1">
+        <div class="pic">
+            <img src="img/chatting.jpeg" type="image/jpeg" alt="chat">
+        </div>
+        <div class="logreg">
+            <div class="auth">
+
+                <!--Start Copied code-->
+
+                <div class="container not-auth d-none">
+                    <div class="logbox">
+                        <button type="button" id="signUpButton">Sign up</button>
+                        <h2>---- or ----</h2>
+                        <button type="button" id="loginButton">Login</button>
+                    </div>
+                </div>
+
+                <div class="form-container d-none">
+                    <form action="">
+                        <label for="">Username
+                            <input type="text" id="username-input" />
+                        </label>
+
+                        <label for="">Password
+                            <input type="password" id="password-input" />
+                        </label>
+
+                        <label for="">Repeat Password
+                            <input type="password" id="password2-input" />
+                        </label>
+                        <button type="submit" id="submit">submit</button>
+                    </form>
+                    <h4 id="change">Create Account/You have account?</h4>
+                </div>
+
+                <!--End Copied code-->
+
+            </div>
+        </div>
+
+    </section>
+
+    <!--End Section1-->
+
+
 </body>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.2.0/axios.js"></script>
 <script src="JS/main.js"></script>
 
