@@ -46,9 +46,9 @@ socket.on("send", (chatId, data) => {
         message.classList.add("message");
         if (data.message.realFilename) {
             message.innerHTML = `<p class="meta">${data.sender} <span>${data.time}</span></p>
-            <p class="text">
+            <p class="text"><a href="api/messages/file/${currentChat}/${data.message.savedFilename}">
                 ${data.message.realFilename}
-            </p>`;
+            </a></p>`;
             message.style.backgroundColor = "#ffa45e";
         } else {
             const decrypt = new JSEncrypt();
@@ -89,7 +89,7 @@ chatForm.addEventListener('submit', async (e) => {
             const message = document.createElement("div");
             message.classList.add("message");
             message.innerHTML = `<p class="meta">${data.body.sender} <span>${data.body.time}</span></p>
-            <p class="text">
+            <p class="text"><a href="api/messages/file/${currentChat}/${data.body.message.savedFilename}">
                 ${data.body.message.realFilename}
             </p>`;
             message.style.backgroundColor = "#ffa45e";
@@ -378,21 +378,24 @@ function addEventToChats() {
                 loading = true;
                 try {
                     const response = await axios.get(`api/messages?chatId=${encodeURIComponent(target.id)}`);
-                    const data = await response.data;
+                    let data = await response.data;
+                    data = JSON.parse(data.body);
 
                     const response2 = await axios.get(`api/messages/pub?targetUser=${target.innerHTML}&chatId=${target.id}`);
                     const data2 = await response2.data;
 
                     messagesDiv.innerHTML = "";
-                    for (let i = 0; i < data.body[0].messages.length; i++) {
-                        const m = data.body[0].messages[i];
+                    for (let i = 0; i < data[0].messages.length; i++) {
+                        let link;
+                        const m = data[0].messages[i];
                         const message = document.createElement("div");
                         message.classList.add("message");
                         if (localStorage.getItem(`${target.id}?${m.index}`)) {
                             try {
-                                const { realFilename } = JSON.parse(localStorage.getItem(`${target.id}?${m.index}`))
+                                const { realFilename, savedFilename } = JSON.parse(localStorage.getItem(`${target.id}?${m.index}`))
                                 m.message = realFilename;
                                 message.style.backgroundColor = "#ffa45e";
+                                link = `<a href="api/messages/file/${target.id}/${savedFilename}">`;
                             } catch (e) {
                                 m.message = localStorage.getItem(`${target.id}?${m.index}`);
                                 if (m.sender === currentUsername) {
@@ -400,9 +403,12 @@ function addEventToChats() {
                                 }
                             }
                         } else {
-                            if (m.message.realFilename) {
+                            if (m.message.savedFilename) {
+                                const savedFilename = m.message.savedFilename;
                                 m.message = m.message.realFilename;
                                 message.style.backgroundColor = "#ffa45e";
+                                link = `<a href="api/messages/file/${target.id}/${savedFilename}">`;
+                                console.log(link);
                             } else {
                                 const decrypt = new JSEncrypt();
                                 decrypt.setPrivateKey(JSON.parse(localStorage.getItem(target.id)).privateKey.replace(/\n/g, ''));
@@ -413,9 +419,9 @@ function addEventToChats() {
                             }
                         }
                         message.innerHTML = `<p class="meta">${m.sender} <span>${m.time}</span></p>
-                    <p class="text">
+                    <p class="text">${link ? link : ""}
                         ${m.message}
-                    </p>`;
+                    ${link ? "</a>" : ""}</p>`;
                         messagesDiv.appendChild(message);
                     }
                     loadingText.classList.add("d-none");
@@ -425,7 +431,7 @@ function addEventToChats() {
                     messagesDiv.scrollTop = messagesDiv.scrollHeight;
                 } catch (e) {
                     currentChat = null;
-                    alert(e.response.data.message);
+                    console.log(e.message);
                 }
                 loading = false;
             }

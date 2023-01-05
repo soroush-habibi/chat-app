@@ -265,7 +265,7 @@ export default class DB {
         }
     }
 
-    static async getMessages(username: string, chatId: any): Promise<null | object[]> {
+    static async getMessages(username: string, chatId: any): Promise<null | object> {
         if (!chatId || typeof chatId !== 'string' || chatId.length !== 16) {
             throw new Error("invalid input");
         }
