@@ -3,7 +3,8 @@ export default class generate {
     static chatId(): string {
         const resourceLength = this.resource.length;
         let result: string = "";
-        for (let i = 0; i < 16; i++) {
+        result += this.resource.charAt(Math.floor(Math.random() * (resourceLength - 10)));
+        for (let i = 0; i < 15; i++) {
             result += this.resource.charAt(Math.floor(Math.random() * resourceLength));
         }
         return result;

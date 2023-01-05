@@ -10,6 +10,7 @@ const chatsDiv = document.getElementById("chats");
 const loadingText = document.getElementById("loading-text");
 const messagesDiv = document.querySelector(".chat-messages");
 const chatInput = document.getElementById("msg");
+const fileInput = document.getElementById("file-input");
 let acceptBtn;
 let declineBtn;
 let currentUsername;
@@ -43,15 +44,23 @@ socket.on("send", (chatId, data) => {
     if (currentChat == chatId) {
         const message = document.createElement("div");
         message.classList.add("message");
-        const decrypt = new JSEncrypt();
-        decrypt.setPrivateKey(JSON.parse(localStorage.getItem(chatId)).privateKey.replace(/\n/g, ''));
-        data.message = decrypt.decrypt(data.message);
-        message.innerHTML = `<p class="meta">${data.sender} <span>${data.time}</span></p>
-    <p class="text">
-        ${data.message}
-    </p>`;
-        if (data.sender === currentUsername) {
-            message.style.backgroundColor = "#89FF8F";
+        if (data.message.realFilename) {
+            message.innerHTML = `<p class="meta">${data.sender} <span>${data.time}</span></p>
+            <p class="text">
+                ${data.message.realFilename}
+            </p>`;
+            message.style.backgroundColor = "#ffa45e";
+        } else {
+            const decrypt = new JSEncrypt();
+            decrypt.setPrivateKey(JSON.parse(localStorage.getItem(chatId)).privateKey.replace(/\n/g, ''));
+            data.message = decrypt.decrypt(data.message);
+            message.innerHTML = `<p class="meta">${data.sender} <span>${data.time}</span></p>
+                                <p class="text">
+                                    ${data.message}
+                                </p>`;
+            if (data.sender === currentUsername) {
+                message.style.backgroundColor = "#89FF8F";
+            }
         }
         messagesDiv.appendChild(message);
         messagesDiv.scrollTop = messagesDiv.scrollHeight;
@@ -63,6 +72,43 @@ chatForm.addEventListener('submit', async (e) => {
 
     if (!currentChat) {
         alert("You must open a chat");
+    } else if (fileInput.files.length === 1) {
+        loading = true;
+        chatFormSubmitBtn.classList.add("d-none");
+        try {
+            const formData = new FormData();
+            formData.append("", fileInput.files[0]);
+            formData.append("chatId", currentChat);
+            const response = await axios.post('api/messages', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            const data = await response.data;
+
+            const message = document.createElement("div");
+            message.classList.add("message");
+            message.innerHTML = `<p class="meta">${data.body.sender} <span>${data.body.time}</span></p>
+            <p class="text">
+                ${data.body.message.realFilename}
+            </p>`;
+            message.style.backgroundColor = "#ffa45e";
+            messagesDiv.appendChild(message);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            socket.emit("sendMessage", currentChat, data.body);
+            chatInput.value = "";
+            fileInput.value = "";
+            localStorage.setItem(`${currentChat}?${data.body.index}`, JSON.stringify({
+                realFilename: data.body.message.realFilename,
+                savedFilename: data.body.message.savedFilename
+            }));
+        } catch (e) {
+            alert(e.response.data.message)
+        }
+
+        loading = false;
+        chatFormSubmitBtn.classList.remove("d-none");
+
     } else {
         loading = true;
         chatFormSubmitBtn.classList.add("d-none");
@@ -343,19 +389,34 @@ function addEventToChats() {
                         const message = document.createElement("div");
                         message.classList.add("message");
                         if (localStorage.getItem(`${target.id}?${m.index}`)) {
-                            m.message = localStorage.getItem(`${target.id}?${m.index}`);
+                            try {
+                                const { realFilename } = JSON.parse(localStorage.getItem(`${target.id}?${m.index}`))
+                                m.message = realFilename;
+                                message.style.backgroundColor = "#ffa45e";
+                            } catch (e) {
+                                m.message = localStorage.getItem(`${target.id}?${m.index}`);
+                                if (m.sender === currentUsername) {
+                                    message.style.backgroundColor = "#89FF8F";
+                                }
+                            }
                         } else {
-                            const decrypt = new JSEncrypt();
-                            decrypt.setPrivateKey(JSON.parse(localStorage.getItem(target.id)).privateKey.replace(/\n/g, ''));
-                            m.message = decrypt.decrypt(m.message);
+                            try {
+                                const { realFilename } = JSON.parse(m.message);
+                                m.message = realFilename;
+                                message.style.backgroundColor = "#ffa45e";
+                            } catch (e) {
+                                const decrypt = new JSEncrypt();
+                                decrypt.setPrivateKey(JSON.parse(localStorage.getItem(target.id)).privateKey.replace(/\n/g, ''));
+                                m.message = decrypt.decrypt(m.message);
+                                if (m.sender === currentUsername) {
+                                    message.style.backgroundColor = "#89FF8F";
+                                }
+                            }
                         }
                         message.innerHTML = `<p class="meta">${m.sender} <span>${m.time}</span></p>
                     <p class="text">
                         ${m.message}
                     </p>`;
-                        if (m.sender === currentUsername) {
-                            message.style.backgroundColor = "#89FF8F";
-                        }
                         messagesDiv.appendChild(message);
                     }
                     loadingText.classList.add("d-none");
