@@ -400,11 +400,10 @@ function addEventToChats() {
                                 }
                             }
                         } else {
-                            try {
-                                const { realFilename } = JSON.parse(m.message);
-                                m.message = realFilename;
+                            if (m.message.realFilename) {
+                                m.message = m.message.realFilename;
                                 message.style.backgroundColor = "#ffa45e";
-                            } catch (e) {
+                            } else {
                                 const decrypt = new JSEncrypt();
                                 decrypt.setPrivateKey(JSON.parse(localStorage.getItem(target.id)).privateKey.replace(/\n/g, ''));
                                 m.message = decrypt.decrypt(m.message);

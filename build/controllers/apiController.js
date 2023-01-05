@@ -413,4 +413,41 @@ export default class controller {
             });
         });
     }
+    static downloadFile(req, res) {
+        DB.connect(async (client) => {
+            const result = await DB.existsChat(res.locals.username, req.params.chatId).catch(e => {
+                res.status(400).json({
+                    success: false,
+                    body: null,
+                    message: e.message
+                });
+            });
+            if (process.env.ROOT) {
+                if (result && fs.existsSync(path.join(process.env.ROOT, "/uploads", req.params.chatId, req.params.filename))) {
+                    res.status(200).download(path.join(process.env.ROOT, "/uploads", req.params.chatId, req.params.filename));
+                }
+                else {
+                    res.status(404).json({
+                        success: false,
+                        body: null,
+                        message: "can not find file"
+                    });
+                }
+            }
+            else {
+                res.status(500).json({
+                    success: false,
+                    body: null,
+                    message: "ROOT does not exist in environment variables"
+                });
+            }
+            client.close();
+        }).catch(e => {
+            res.status(500).json({
+                success: false,
+                body: null,
+                message: e.message
+            });
+        });
+    }
 }

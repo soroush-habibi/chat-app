@@ -148,6 +148,18 @@ export default class DB {
             }
         }
     }
+    static async existsChat(username, chatId) {
+        if (chatId == null || typeof chatId !== 'string' || chatId.length !== 16) {
+            throw new Error("invalid input");
+        }
+        const chat = await this.client.db("chatApp").collection("chats").findOne({ chat_id: chatId, users: { $elemMatch: { username: username } } });
+        if (chat) {
+            return true;
+        }
+        else {
+            return false;
+        }
+    }
     static async getInvitesReceived(username) {
         const invites = await this.client.db("chatApp").collection("chats").find({ receiver: username }).project({ _id: 0, messages: 0, receiver: 0 }).toArray();
         return invites;
@@ -206,8 +218,7 @@ export default class DB {
                 messages: {
                     sender: username,
                     time: time,
-                    message: JSON.stringify({ realFilename, savedFilename }),
-                    file: true,
+                    message: { realFilename, savedFilename },
                     index: index
                 }
             }
@@ -217,7 +228,6 @@ export default class DB {
                 sender: username,
                 time: time,
                 message: { realFilename, savedFilename },
-                file: true,
                 index: index
             };
         }
