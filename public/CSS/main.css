@@ -39,6 +39,10 @@
     margin: 0px;
 }
 
+body {
+    background-image: url(../img/bg-main.gif);
+}
+
 header {
     background-color: rgb(111, 186, 196);
     height: 70px;
@@ -73,6 +77,7 @@ header div.hdr1 div.webtitle h1 a {
 
 header div.hdr1 div.webtitle h1 a:hover {
     cursor: pointer;
+    color: rgb(202, 255, 255);
 }
 
 header div.hdr1 div.logo img {
@@ -115,6 +120,9 @@ header div.hdr0 {
 .section1 {
     display: flex;
     flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    margin-top: 30PX;
 }
 
 .section1 .pic {
@@ -140,8 +148,10 @@ header div.hdr0 {
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 800px;
-    background-image: radial-gradient(rgb(255, 246, 230), rgb(127, 225, 255));
+    height: 650px;
+    /*background-image: radial-gradient(rgb(255, 246, 230),rgb(127, 225, 255));*/
+    border-radius: 30px;
+    background-image: url(../img/surfy-pattern.jpg);
 }
 
 .section1 .logreg .auth .container .logbox {
@@ -150,6 +160,7 @@ header div.hdr0 {
     justify-content: center;
     align-items: center;
     background-color: rgb(127, 225, 255);
+    border: 1px solid blue;
     border-radius: 15px;
     height: 300px;
     width: 250px;
@@ -179,9 +190,15 @@ header div.hdr0 {
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 800px;
-    /*background:rgb(255, 246, 230);*/
-    background-image: radial-gradient(rgb(255, 246, 230), rgb(127, 225, 255));
+    height: 650px;
+    background-image: url(../img/surfy-pattern.jpg);
+    /*background-image: radial-gradient(rgb(255, 246, 230),rgb(127, 225, 255));*/
+    border-radius: 30px;
+}
+
+.section1 .logreg .auth .form-container H4 {
+    background-color: rgba(255, 255, 255, 0.781);
+    border: 2PX solid rgb(0, 30, 201);
 }
 
 .section1 .logreg .auth .form-container button {
@@ -199,7 +216,7 @@ header div.hdr0 {
     align-items: center;
     justify-content: center;
     width: 200px;
-    /*border: 2px solid rgb(0, 26, 143);*/
+    border: 1px solid blue;
     border-radius: 15px;
     background-color: rgb(127, 225, 255);
     padding: 55px 20px 40px 45px;
