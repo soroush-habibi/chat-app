@@ -324,7 +324,6 @@ export default class controller {
                             } while (fs.existsSync(path.join(process.env.ROOT, "/uploads", fields.chatId as string, savedFilename)));
 
                             DB.connect(async (client) => {
-
                                 const result = await DB.sendFile(res.locals.username, fields.chatId as string, realFilename, savedFilename, files[''].size).catch(e => {
                                     res.status(400).json({
                                         success: false,
@@ -336,6 +335,7 @@ export default class controller {
                                 if (result) {
                                     if (process.env.ROOT) {
                                         fs.copyFileSync(filepath, path.join(process.env.ROOT, "/uploads", fields.chatId as string, savedFilename));
+                                        fs.unlinkSync(filepath);
                                     } else {
                                         res.status(500).json({
                                             success: false,

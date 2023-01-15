@@ -305,6 +305,7 @@ export default class controller {
                                 if (result) {
                                     if (process.env.ROOT) {
                                         fs.copyFileSync(filepath, path.join(process.env.ROOT, "/uploads", fields.chatId, savedFilename));
+                                        fs.unlinkSync(filepath);
                                     }
                                     else {
                                         res.status(500).json({
