@@ -1,5 +1,5 @@
 <h1>Realtime chat application </h1>
-<p>This API made for university food system and use Node.js, Express.js, MongoDB, JWT and more... </p><hr/>
+<p>Realtime chat application using Node.js , Express.js , MongoDB , Socket.IO with end to end encryption and made with Typescript</p><hr/>
 <h2>Guide</h2>
 First clone this project and open the folder<br/>
 Then execute below command to install all package needed:<br/>
